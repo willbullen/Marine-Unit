@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buoy QC Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-2xl font-bold text-gray-900">🌊 Buoy QC Dashboard</h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="runQCProcessing()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            Run QC Processing
+                        </button>
+                        <button onclick="showQCLimits()" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
+                            Manage QC Limits
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Overview Cards -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                                    <span class="text-white font-bold">5</span>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Stations</dt>
+                                    <dd class="text-lg font-medium text-gray-900">5 Active</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                                    <span class="text-white font-bold">15</span>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">QC Results</dt>
+                                    <dd class="text-lg font-medium text-gray-900">15 Datasets</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                                    <span class="text-white font-bold">91</span>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Avg QC Rate</dt>
+                                    <dd class="text-lg font-medium text-gray-900">91% Complete</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                                    <span class="text-white font-bold">1</span>
+                                </div>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Issues</dt>
+                                    <dd class="text-lg font-medium text-gray-900">Station 62091</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Station Overview -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Station Overview</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Quality control status for all buoy stations</p>
+                </div>
+                <ul class="divide-y divide-gray-200" id="station-list">
+                    <!-- Station data will be loaded here -->
+                </ul>
+            </div>
+
+            <!-- QC Limits Management -->
+            <div id="qc-limits-panel" class="hidden bg-white shadow overflow-hidden sm:rounded-md">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">QC Limits Management</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Configure station-specific quality control thresholds</p>
+                </div>
+                <div class="px-4 py-5 sm:px-6">
+                    <div id="qc-limits-content">
+                        <!-- QC limits content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Station data from our QC processing results
+        const stationData = [
+            {
+                station_id: '62091',
+                name: 'M2 Buoy',
+                location: 'Exposed Atlantic Location',
+                exposure_type: 'exposed',
+                qc_rates: { '2023': 94.3, '2024': 78.1, '2025': 68.6 },
+                overall_rate: 82.5,
+                status: 'declining',
+                total_records: 41964
+            },
+            {
+                station_id: '62092',
+                name: 'M3 Buoy', 
+                location: 'Coastal/Sheltered Location',
+                exposure_type: 'coastal',
+                qc_rates: { '2023': 95.6, '2024': 93.3, '2025': 89.2 },
+                overall_rate: 93.2,
+                status: 'excellent',
+                total_records: 42795
+            },
+            {
+                station_id: '62093',
+                name: 'M4 Buoy',
+                location: 'Intermediate Exposure Location', 
+                exposure_type: 'intermediate',
+                qc_rates: { '2023': 97.1, '2024': 94.2, '2025': 93.3 },
+                overall_rate: 95.1,
+                status: 'excellent',
+                total_records: 42560
+            },
+            {
+                station_id: '62094',
+                name: 'M5 Buoy',
+                location: 'Variable Conditions Location',
+                exposure_type: 'variable', 
+                qc_rates: { '2023': 89.6, '2024': 84.3, '2025': 91.4 },
+                overall_rate: 88.2,
+                status: 'good',
+                total_records: 42320
+            },
+            {
+                station_id: '62095',
+                name: 'M6 Buoy',
+                location: 'Unique Location Characteristics',
+                exposure_type: 'unique',
+                qc_rates: { '2023': 97.8, '2024': 92.2, '2025': 91.3 },
+                overall_rate: 94.0,
+                status: 'excellent', 
+                total_records: 40064
+            }
+        ];
+
+        // QC Limits data
+        const qcLimitsData = {
+            'environmental': [
+                { param: 'airpressure', name: 'Air Pressure', unit: 'hPa', min: 950, max: 1050, spike: 10 },
+                { param: 'airtemp', name: 'Air Temperature', unit: '°C', min: -20, max: 40, spike: 5 },
+                { param: 'humidity', name: 'Humidity', unit: '%', min: 0, max: 100, spike: 20 },
+                { param: 'windsp', name: 'Wind Speed', unit: 'm/s', min: 0, max: 50, spike: 15 },
+                { param: 'winddir', name: 'Wind Direction', unit: '°', min: 0, max: 360, spike: 180 }
+            ],
+            'wave': [
+                { param: 'hm0', name: 'Significant Wave Height', unit: 'm', min: 0, max: 15, spike: 3 },
+                { param: 'hmax', name: 'Maximum Wave Height', unit: 'm', min: 0, max: 25, spike: 5 },
+                { param: 'tp', name: 'Wave Period', unit: 's', min: 1, max: 25, spike: 10 },
+                { param: 'mdir', name: 'Mean Wave Direction', unit: '°', min: 0, max: 360, spike: 180 }
+            ],
+            'water': [
+                { param: 'seatemp_aa', name: 'Sea Temperature', unit: '°C', min: -2, max: 30, spike: 3 },
+                { param: 'salinity_16', name: 'Salinity', unit: 'ppt', min: 20, max: 40, spike: 5 }
+            ]
+        };
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'excellent': return 'bg-green-100 text-green-800';
+                case 'good': return 'bg-yellow-100 text-yellow-800';
+                case 'declining': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getQCRateColor(rate) {
+            if (rate >= 95) return 'text-green-600';
+            if (rate >= 85) return 'text-yellow-600';
+            return 'text-red-600';
+        }
+
+        function loadStationData() {
+            const stationList = document.getElementById('station-list');
+            stationList.innerHTML = '';
+
+            stationData.forEach(station => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="px-4 py-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
+                                    <span class="text-sm font-medium text-white">${station.station_id}</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${station.name}</div>
+                                <div class="text-sm text-gray-500">${station.location}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="text-sm text-gray-900">
+                                <span class="text-xs text-gray-500">Exposure:</span> ${station.exposure_type}
+                            </div>
+                            <div class="text-sm text-gray-900">
+                                <span class="text-xs text-gray-500">Records:</span> ${station.total_records.toLocaleString()}
+                            </div>
+                            <div class="text-sm">
+                                <span class="text-xs text-gray-500">QC Rate:</span>
+                                <span class="${getQCRateColor(station.overall_rate)} font-semibold">${station.overall_rate.toFixed(1)}%</span>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(station.status)}">
+                                ${station.status}
+                            </span>
+                            <div class="flex space-x-2">
+                                <button onclick="viewStationDetails('${station.station_id}')" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                                    View Details
+                                </button>
+                                <button onclick="downloadStationData('${station.station_id}')" class="text-green-600 hover:text-green-900 text-sm font-medium">
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                stationList.appendChild(li);
+            });
+        }
+
+        function showQCLimits() {
+            const panel = document.getElementById('qc-limits-panel');
+            const content = document.getElementById('qc-limits-content');
+            
+            panel.classList.remove('hidden');
+            
+            // Create QC limits interface
+            let html = `
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Station:</label>
+                    <select id="station-selector" onchange="loadStationLimits()" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Choose a station...</option>
+                        ${stationData.map(s => `<option value="${s.station_id}">Station ${s.station_id} - ${s.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div id="limits-editor" class="hidden">
+                    <!-- Limits editor will be loaded here -->
+                </div>
+            `;
+            
+            content.innerHTML = html;
+        }
+
+        function loadStationLimits() {
+            const stationId = document.getElementById('station-selector').value;
+            const editor = document.getElementById('limits-editor');
+            
+            if (!stationId) {
+                editor.classList.add('hidden');
+                return;
+            }
+            
+            editor.classList.remove('hidden');
+            
+            const station = stationData.find(s => s.station_id === stationId);
+            let html = `
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h4 class="font-semibold text-blue-900">${station.name}</h4>
+                    <p class="text-blue-700">${station.location} (${station.exposure_type} exposure)</p>
+                </div>
+            `;
+            
+            Object.entries(qcLimitsData).forEach(([category, params]) => {
+                html += `
+                    <div class="mb-8">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-4 capitalize">${category} Parameters</h4>
+                        <div class="space-y-4">
+                `;
+                
+                params.forEach(param => {
+                    html += `
+                        <div class="grid grid-cols-12 gap-4 items-center p-4 border rounded-lg">
+                            <div class="col-span-3">
+                                <h5 class="font-medium">${param.name}</h5>
+                                <p class="text-sm text-gray-500">${param.param} ${param.unit ? `(${param.unit})` : ''}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Min Value</label>
+                                <input type="number" step="0.1" value="${param.min}" 
+                                       class="w-full px-2 py-1 border rounded text-sm"
+                                       onchange="updateLimit('${stationId}', '${param.param}', 'min', this.value)">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Max Value</label>
+                                <input type="number" step="0.1" value="${param.max}"
+                                       class="w-full px-2 py-1 border rounded text-sm"
+                                       onchange="updateLimit('${stationId}', '${param.param}', 'max', this.value)">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Spike Threshold</label>
+                                <input type="number" step="0.1" value="${param.spike}"
+                                       class="w-full px-2 py-1 border rounded text-sm"
+                                       onchange="updateLimit('${stationId}', '${param.param}', 'spike', this.value)">
+                            </div>
+                            <div class="col-span-3">
+                                <button onclick="resetToDefault('${stationId}', '${param.param}')" 
+                                        class="text-sm text-blue-600 hover:text-blue-800">
+                                    Reset to Default
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button onclick="saveAllLimits('${stationId}')" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                        Save All Changes
+                    </button>
+                </div>
+            `;
+            
+            editor.innerHTML = html;
+        }
+
+        function updateLimit(stationId, parameter, type, value) {
+            console.log(`Updating ${stationId} ${parameter} ${type} to ${value}`);
+            // In a real implementation, this would make an API call
+            showNotification(`Updated ${parameter} ${type} limit for station ${stationId}`, 'success');
+        }
+
+        function resetToDefault(stationId, parameter) {
+            console.log(`Resetting ${parameter} to default for station ${stationId}`);
+            showNotification(`Reset ${parameter} to default limits`, 'info');
+            loadStationLimits(); // Reload the interface
+        }
+
+        function saveAllLimits(stationId) {
+            console.log(`Saving all limits for station ${stationId}`);
+            showNotification(`All QC limits saved for station ${stationId}`, 'success');
+        }
+
+        function runQCProcessing() {
+            showNotification('QC processing started. This would trigger the existing QC processor scripts.', 'info');
+            // In a real implementation, this would call the QC processor
+        }
+
+        function viewStationDetails(stationId) {
+            const station = stationData.find(s => s.station_id === stationId);
+            alert(`Station ${stationId} Details:\\n\\n` +
+                  `Name: ${station.name}\\n` +
+                  `Location: ${station.location}\\n` +
+                  `Overall QC Rate: ${station.overall_rate}%\\n` +
+                  `Total Records: ${station.total_records.toLocaleString()}\\n\\n` +
+                  `QC Rates by Year:\\n` +
+                  `2023: ${station.qc_rates['2023']}%\\n` +
+                  `2024: ${station.qc_rates['2024']}%\\n` +
+                  `2025: ${station.qc_rates['2025']}%`);
+        }
+
+        function downloadStationData(stationId) {
+            showNotification(`Download initiated for station ${stationId}. Files would be downloaded from QC Data folder.`, 'info');
+            // In a real implementation, this would download the actual files
+        }
+
+        function showNotification(message, type = 'info') {
+            const colors = {
+                success: 'bg-green-100 border-green-400 text-green-700',
+                error: 'bg-red-100 border-red-400 text-red-700',
+                info: 'bg-blue-100 border-blue-400 text-blue-700'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 border rounded-md ${colors[type]} z-50`;
+            notification.innerHTML = `
+                <div class="flex">
+                    <div class="flex-1">${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-sm font-medium">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStationData();
+            showNotification('Buoy QC Dashboard loaded successfully! All station data and QC limits are available.', 'success');
+        });
+    </script>
+</body>
+</html>
