@@ -1,6 +1,6 @@
 # Storm Jocelyn - Marine Storm Report
 
-**Report Generated:** 2025-08-20 13:42:06
+**Report Generated:** 2025-08-25 13:36:50
 
 ## Storm Overview
 
@@ -15,15 +15,15 @@
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62091** (M1 Buoy): 53.47°N, 5.42°W - West Coast
+- **Buoy 62091** (M1 Buoy (Retired)): 53.47°N, 5.42°W - West Coast
 - **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W - West Coast
-- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W - Southwest Coast
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W - Southwest Coast
+- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W - South Coast
+- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W - South Coast
 - **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W - West Coast
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 36.9 m/s (132.8 km/h) at Buoy 62095
+- **Maximum Wind Speed:** 19.0 m/s (68.3 km/h) at Buoy 62095
 - **Maximum Significant Wave Height (Hm0):** 12.1 m at Buoy 62095
 - **Maximum Wave Height (Hmax):** 19.2 m at Buoy 62095
 - **Minimum Pressure:** 980.6 hPa at Buoy 62093
@@ -33,10 +33,10 @@
 
 ### Station-by-Station Analysis
 
-### Buoy 62091 - M1 Buoy
+### Buoy 62091 - M1 Buoy (Retired)
 - **Location:** 53.47°N, 5.42°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 36.4 m/s (131.2 km/h)
+- **Peak Wind Speed:** 18.7 m/s (67.5 km/h)
 - **Peak Significant Wave Height (Hm0):** 4.1 m  
 - **Peak Maximum Wave Height (Hmax):** 8.3 m
 - **Minimum Pressure:** 985.6 hPa
@@ -47,7 +47,7 @@
 ### Buoy 62092 - M2 Buoy
 - **Location:** 53.48°N, 5.42°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 30.1 m/s (108.2 km/h)
+- **Peak Wind Speed:** 15.5 m/s (55.7 km/h)
 - **Peak Significant Wave Height (Hm0):** 10.5 m  
 - **Peak Maximum Wave Height (Hmax):** 17.8 m
 - **Minimum Pressure:** 997.6 hPa
@@ -57,8 +57,8 @@
 
 ### Buoy 62093 - M3 Buoy
 - **Location:** 51.22°N, 6.70°W
-- **Region:** Southwest Coast
-- **Peak Wind Speed:** 35.1 m/s (126.3 km/h)
+- **Region:** South Coast
+- **Peak Wind Speed:** 18.0 m/s (65.0 km/h)
 - **Peak Significant Wave Height (Hm0):** 10.5 m  
 - **Peak Maximum Wave Height (Hmax):** 16.5 m
 - **Minimum Pressure:** 980.6 hPa
@@ -68,8 +68,8 @@
 
 ### Buoy 62094 - M4 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Region:** Southwest Coast
-- **Peak Wind Speed:** 31.1 m/s (111.9 km/h)
+- **Region:** South Coast
+- **Peak Wind Speed:** 16.0 m/s (57.6 km/h)
 - **Peak Significant Wave Height (Hm0):** 7.3 m  
 - **Peak Maximum Wave Height (Hmax):** 12.5 m
 - **Minimum Pressure:** 994.2 hPa
@@ -80,7 +80,7 @@
 ### Buoy 62095 - M5 Buoy
 - **Location:** 53.06°N, 7.90°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 36.9 m/s (132.8 km/h)
+- **Peak Wind Speed:** 19.0 m/s (68.3 km/h)
 - **Peak Significant Wave Height (Hm0):** 12.1 m  
 - **Peak Maximum Wave Height (Hmax):** 19.2 m
 - **Minimum Pressure:** 989.7 hPa
@@ -92,7 +92,7 @@
 
 ### Wind Analysis
 
-The storm produced maximum sustained winds of **36.9 m/s** (132.8 km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
+The storm produced maximum sustained winds of **19.0 m/s** (68.3 km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
 
 **Wind Categories:**
 - Force 7 (Strong Gale): 13.9-17.1 m/s (50-61 km/h)
@@ -105,7 +105,7 @@ The storm produced maximum sustained winds of **36.9 m/s** (132.8 km/h), represe
 
 **Significant Wave Heights (Hm0):** Peak values reached **12.1 m**, representing **very high** sea states according to the World Meteorological Organization classification.
 
-**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **19.2 m**, representing **phenomenal** conditions for maximum wave heights.
+**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **19.2 m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
 **Wave Height Relationship:** The Hmax/Hm0 ratio was **1.59**, within normal range (1.3-1.8).
 
@@ -119,29 +119,6 @@ The storm produced maximum sustained winds of **36.9 m/s** (132.8 km/h), represe
 **Wave Height Definitions:**
 - **Hm0 (Significant Wave Height):** Average height of the highest one-third of waves
 - **Hmax (Maximum Wave Height):** Highest individual wave recorded during the period
-
-
-### Pressure Analysis
-
-Atmospheric pressure dropped to a minimum of **980.6 hPa**, representing a pressure anomaly of 32.7 hPa below standard atmospheric pressure (1013.25 hPa).
-
-**Pressure Categories:**
-- Normal: 1013-1023 hPa
-- Low: 1000-1013 hPa
-- Very Low: 980-1000 hPa  
-- Extremely Low: <980 hPa
-
-
-## Storm Timeline
-
-**Storm Period:** 2024-01-22 00:00 to 2024-01-26 00:00 UTC
-
-**Duration:** 4 days, 0 hours
-
-**Key Timeline Points:**
-- Storm approach: Pressure began dropping and winds increased
-- Peak intensity: Maximum winds and waves recorded
-- Storm passage: Gradual improvement in conditions
 
 
 ## Quality Control Summary
@@ -160,14 +137,13 @@ Atmospheric pressure dropped to a minimum of **980.6 hPa**, representing a press
 
 ![Storm Overview](Storm_Jocelyn_overview.png)
 
-*Figure 1: Comprehensive marine meteorological analysis showing wind speed, wave height, atmospheric pressure, air temperature, wind direction, and wave period during Storm Jocelyn.*
+*Figure 1: Marine meteorological analysis showing wind speed, wave height, atmospheric pressure, air temperature, wind direction, and wave period during Storm Jocelyn.*
 
 ## Technical Notes
 
 ### QC Methods Applied
 - **Manual QC:** Visual inspection and expert validation
-- **Automatic QC:** Range checks, spike detection, and flat-line identification  
-- **AI-powered QC:** Machine learning algorithms for anomaly detection
+- **Automatic QC:** Range checks, spike detection, and flat-line identification
 
 ### Data Quality Indicators
 - 0: No QC performed
@@ -176,12 +152,6 @@ Atmospheric pressure dropped to a minimum of **980.6 hPa**, representing a press
 - 5: QC performed, raw data not OK but value adjusted/interpolated
 - 6: QC performed, data OK (Datawell Hmax sensor specific)
 - 9: Data missing
-
-### Measurement Uncertainties
-- Wind Speed: ±0.3 m/s
-- Wave Height: ±5% or 0.5m (whichever greater)
-- Atmospheric Pressure: ±0.5 hPa
-- Air Temperature: ±0.2°C
 
 ---
 

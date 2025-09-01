@@ -127,29 +127,31 @@ class MarineStormAnalyzer:
             },
             "Storm Floris": {
                 "dates": ["2025-08-04", "2025-08-05"],
-                "description": "Unseasonably strong August Bank Holiday storm bringing widespread disruption across western Ireland.",
-                "peak_winds": "100+ km/h",
-                "areas_affected": ["West Coast", "Northwest", "Western counties"]
+                "description": "August Bank Holiday storm affecting northern and western coastal areas.",
+                "peak_winds": "55+ km/h",
+                "areas_affected": ["North Coast", "Northwest", "West Coast"]
             }
         }
         }
         
         # Storm detection criteria for automated analysis
+        # Note: windsp is stored in knots in the database
         self.storm_criteria = {
-            'wind_speed_threshold': 15.0,  # m/s (~54 km/h)
+            'wind_speed_threshold': 29.0,  # knots (~54 km/h, ~15 m/s)
             'wave_height_threshold': 4.0,  # meters
             'pressure_drop_threshold': 10.0,  # hPa
             'duration_hours': 6,  # minimum storm duration
-            'gust_threshold': 20.0  # m/s (~72 km/h)
+            'gust_threshold': 39.0  # knots (~72 km/h, ~20 m/s)
         }
         
-        # Buoy station information
+        # Buoy station information - Updated based on official Met Éireann sources
+        # Note: M1 Buoy is retired, locations verified against https://www.met.ie/forecasts/marine-inland-lakes/buoys/buoy-locations
         self.buoy_stations = {
-            "62091": {"name": "M1 Buoy", "location": "53.47°N, 5.42°W", "region": "West Coast"},
-            "62092": {"name": "M2 Buoy", "location": "53.48°N, 5.42°W", "region": "West Coast"}, 
-            "62093": {"name": "M3 Buoy", "location": "51.22°N, 6.70°W", "region": "Southwest Coast"},
-            "62094": {"name": "M4 Buoy", "location": "51.69°N, 6.70°W", "region": "Southwest Coast"},
-            "62095": {"name": "M5 Buoy", "location": "53.06°N, 7.90°W", "region": "West Coast"}
+            "62091": {"name": "M1 Buoy (Retired)", "location": "53.47°N, 5.42°W", "status": "retired"},
+            "62092": {"name": "M2 Buoy", "location": "53.48°N, 5.42°W", "status": "active"}, 
+            "62093": {"name": "M3 Buoy", "location": "51.22°N, 6.70°W", "status": "active"},
+            "62094": {"name": "M4 Buoy", "location": "51.69°N, 6.70°W", "status": "active"},
+            "62095": {"name": "M5 Buoy", "location": "53.06°N, 7.90°W", "status": "active"}
         }
 
     def load_qc_data(self):
@@ -177,6 +179,24 @@ class MarineStormAnalyzer:
                     print(f"  Error loading {file}: {e}")
         
         print(f"Successfully loaded QC data for {len(self.qc_data)} station-years")
+
+    def assess_storm_severity(self, stats):
+        """Assess storm severity based on meteorological criteria"""
+        # Convert wind speed from knots to m/s for severity assessment
+        wind_speed_mps = stats['peak_wind_speed'] * 0.514444  # knots to m/s
+        
+        if wind_speed_mps < 20.0:  # < 40 knots
+            return "minor"
+        elif wind_speed_mps < 30.0:  # < 60 knots
+            return "moderate"
+        else:
+            return "major"
+
+    def convert_wind_speed_units(self, wind_speed_knots):
+        """Convert wind speed from knots to m/s and km/h"""
+        wind_speed_mps = wind_speed_knots * 0.514444  # knots to m/s
+        wind_speed_kmh = wind_speed_knots * 1.852     # knots to km/h
+        return wind_speed_mps, wind_speed_kmh
 
     def detect_storm_periods(self, df, station_id):
         """Detect potential storm periods in the data based on meteorological criteria"""
@@ -289,9 +309,10 @@ class MarineStormAnalyzer:
             good_tp = df[df['ind_tp'] == 1]
             good_winddir = df[df['ind_winddir'] == 1]
             
-            # Wind Speed (only good data)
+            # Wind Speed (only good data) - Convert from knots to m/s for display
             if not good_windsp.empty:
-                axes[0, 0].plot(good_windsp['time'], good_windsp['windsp'], color=color, label=label, alpha=0.8, linewidth=2)
+                wind_speed_mps = good_windsp['windsp'] * 0.514444  # knots to m/s
+                axes[0, 0].plot(good_windsp['time'], wind_speed_mps, color=color, label=label, alpha=0.8, linewidth=2)
             axes[0, 0].set_title('Wind Speed (m/s) - QC Good Data Only', fontsize=12, fontweight='bold')
             axes[0, 0].set_ylabel('Wind Speed (m/s)')
             axes[0, 0].grid(True, alpha=0.3)
@@ -342,8 +363,10 @@ class MarineStormAnalyzer:
                 # Match wind direction with wind speed data
                 wind_combined = df[(df['ind_winddir'] == 1) & (df['ind_windsp'] == 1)]
                 if not wind_combined.empty:
+                    # Convert wind speed from knots to m/s for color mapping
+                    wind_speed_mps = wind_combined['windsp'] * 0.514444
                     scatter = axes[3, 0].scatter(wind_combined['time'], wind_combined['winddir'], 
-                                               c=wind_combined['windsp'], cmap='viridis', alpha=0.7, s=30, label=label)
+                                               c=wind_speed_mps, cmap='viridis', alpha=0.7, s=30, label=label)
             axes[3, 0].set_title('Wind Direction (colored by speed) - QC Good Data Only', fontsize=12, fontweight='bold')
             axes[3, 0].set_ylabel('Wind Direction (°)')
             axes[3, 0].grid(True, alpha=0.3)
@@ -379,24 +402,82 @@ class MarineStormAnalyzer:
         # Calculate storm statistics
         stats = self.calculate_storm_statistics(storm_data)
         
+        # Assess storm severity to determine appropriate content
+        severity = self.assess_storm_severity(stats)
+        
         # Create visualizations if not provided
         if overview_plot is None:
             overview_plot = self.create_storm_visualizations(storm_name, storm_data, output_dir)
         
-        # Generate markdown content
+        # Generate markdown content based on severity
+        if severity == "minor":
+            md_content = self._generate_minor_storm_report(storm_name, storm_info, storm_data, stats, overview_plot)
+        else:
+            md_content = self._generate_full_storm_report(storm_name, storm_info, storm_data, stats, overview_plot)
+        
+        return md_content
+
+    def _generate_minor_storm_report(self, storm_name, storm_info, storm_data, stats, overview_plot):
+        """Generate streamlined report for minor storms"""
         md_content = f"""# {storm_name} - Marine Storm Report
 
 **Report Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
-## Storm Overview
+## Marine Observations Summary
 
-**Dates:** {', '.join(storm_info['info']['dates'])}
+### Data Sources
+{self._format_data_sources(storm_data)}
 
-**Description:** {storm_info['info']['description']}
+### Peak Conditions Observed
+{self._format_peak_conditions(stats)}
 
-**Peak Winds:** {storm_info['info']['peak_winds']}
+### Station-by-Station Analysis
+{self._format_station_analysis(storm_data, stats)}
 
-**Areas Affected:** {', '.join(storm_info['info']['areas_affected'])}
+## Meteorological Analysis
+
+### Wind Analysis
+{self._format_wind_analysis(stats)}
+
+### Wave Analysis  
+{self._format_wave_analysis(stats)}
+
+## Quality Control Summary
+{self._format_qc_summary(storm_data)}
+
+## Data Visualization
+
+![Storm Overview]({os.path.basename(overview_plot)})
+
+*Figure 1: Marine meteorological analysis showing wind speed, wave height, atmospheric pressure, air temperature, wind direction, and wave period during {storm_name}.*
+
+## Technical Notes
+
+### QC Methods Applied
+- **Manual QC:** Visual inspection and expert validation
+- **Automatic QC:** Range checks, spike detection, and flat-line identification
+
+### Data Quality Indicators
+- 0: No QC performed
+- 1: QC performed, data OK
+- 4: QC performed, raw data not OK and not adjusted
+- 5: QC performed, raw data not OK but value adjusted/interpolated
+- 6: QC performed, data OK (Datawell Hmax sensor specific)
+- 9: Data missing
+
+---
+
+*Report generated by Marine Storm Analysis System*
+*Data source: Irish Marine Data Buoy Network*
+*Quality controlled data from Met Éireann marine observations*
+"""
+        return md_content
+
+    def _generate_full_storm_report(self, storm_name, storm_info, storm_data, stats, overview_plot):
+        """Generate comprehensive report for moderate/major storms"""
+        md_content = f"""# {storm_name} - Marine Storm Report
+
+**Report Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ## Marine Observations Summary
 
@@ -420,9 +501,6 @@ class MarineStormAnalyzer:
 ### Pressure Analysis
 {self._format_pressure_analysis(stats)}
 
-## Storm Timeline
-{self._format_storm_timeline(storm_data)}
-
 ## Quality Control Summary
 {self._format_qc_summary(storm_data)}
 
@@ -436,8 +514,7 @@ class MarineStormAnalyzer:
 
 ### QC Methods Applied
 - **Manual QC:** Visual inspection and expert validation
-- **Automatic QC:** Range checks, spike detection, and flat-line identification  
-- **AI-powered QC:** Machine learning algorithms for anomaly detection
+- **Automatic QC:** Range checks, spike detection, and flat-line identification
 
 ### Data Quality Indicators
 - 0: No QC performed
@@ -447,19 +524,12 @@ class MarineStormAnalyzer:
 - 6: QC performed, data OK (Datawell Hmax sensor specific)
 - 9: Data missing
 
-### Measurement Uncertainties
-- Wind Speed: ±0.3 m/s
-- Wave Height: ±5% or 0.5m (whichever greater)
-- Atmospheric Pressure: ±0.5 hPa
-- Air Temperature: ±0.2°C
-
 ---
 
 *Report generated by Marine Storm Analysis System*
 *Data source: Irish Marine Data Buoy Network*
 *Quality controlled data from Met Éireann marine observations*
 """
-
         return md_content
 
     def calculate_storm_statistics(self, storm_data):
@@ -585,14 +655,14 @@ class MarineStormAnalyzer:
             station = station_key.split('_')[0]
             if station in self.buoy_stations:
                 info = self.buoy_stations[station]
-                sources.append(f"- **Buoy {station}** ({info['name']}): {info['location']} - {info['region']}")
+                sources.append(f"- **Buoy {station}** ({info['name']}): {info['location']}")
         
         return '\n'.join(sources) if sources else "No data sources available"
 
     def _format_peak_conditions(self, stats):
         """Format peak conditions section"""
         return f"""
-- **Maximum Wind Speed:** {stats['peak_wind_speed']:.1f} m/s ({stats['peak_wind_speed'] * 3.6:.1f} km/h) at Buoy {stats['peak_wind_buoy']}
+- **Maximum Wind Speed:** {stats['peak_wind_speed'] * 0.514444:.1f} m/s ({stats['peak_wind_speed'] * 1.852:.1f} km/h) at Buoy {stats['peak_wind_buoy']}
 - **Maximum Significant Wave Height (Hm0):** {stats['peak_hm0']:.1f} m at Buoy {stats['peak_hm0_buoy']}
 - **Maximum Wave Height (Hmax):** {stats['peak_hmax']:.1f} m at Buoy {stats['peak_hmax_buoy']}
 - **Minimum Pressure:** {stats['min_pressure']:.1f} hPa at Buoy {stats['min_pressure_buoy']}
@@ -613,8 +683,7 @@ class MarineStormAnalyzer:
                 analysis.append(f"""
 ### Buoy {station} - {station_info.get('name', 'Unknown')}
 - **Location:** {station_info.get('location', 'Unknown')}
-- **Region:** {station_info.get('region', 'Unknown')}
-- **Peak Wind Speed:** {station_stat['max_wind']:.1f} m/s ({station_stat['max_wind'] * 3.6:.1f} km/h)
+- **Peak Wind Speed:** {station_stat['max_wind']} knots ({station_stat['max_wind'] * 1.852:.1f} km/h)
 - **Peak Significant Wave Height (Hm0):** {station_stat['max_hm0']:.1f} m  
 - **Peak Maximum Wave Height (Hmax):** {station_stat['max_hmax']:.1f} m
 - **Minimum Pressure:** {station_stat['min_pressure']:.1f} hPa
@@ -627,24 +696,26 @@ class MarineStormAnalyzer:
     def _format_wind_analysis(self, stats):
         """Format wind analysis section"""
         return f"""
-The storm produced maximum sustained winds of **{stats['peak_wind_speed']:.1f} m/s** ({stats['peak_wind_speed'] * 3.6:.1f} km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
+The storm produced maximum sustained winds of **{stats['peak_wind_speed']} knots** ({stats['peak_wind_speed'] * 1.852:.1f} km/h).
 
 **Wind Categories:**
-- Force 7 (Strong Gale): 13.9-17.1 m/s (50-61 km/h)
-- Force 8 (Gale): 17.2-20.7 m/s (62-74 km/h)  
-- Force 9 (Strong Gale): 20.8-24.4 m/s (75-88 km/h)
-- Force 10+ (Storm): >24.5 m/s (>88 km/h)
+- Force 7 — Near gale: 28–33 kn (50–61 km/h)
+- Force 8 — Gale: 34–40 kn (62–74 km/h)
+- Force 9 — Severe gale (aka Strong gale): 41–47 kn (75–88 km/h)
+- Force 10 — Storm: 48–55 kn (89–102 km/h)
+- Force 11 — Violent storm: 56–63 kn (103–117 km/h)
+- Force 12 — Hurricane force: ≥64 kn (≥118 km/h)
 """
 
     def _format_wave_analysis(self, stats):
         """Format wave analysis section"""
+        # Sea state classification only applies to Hm0 (significant wave height)
         hm0_category = "rough" if stats['peak_hm0'] < 4 else "very rough" if stats['peak_hm0'] < 6 else "high" if stats['peak_hm0'] < 9 else "very high" if stats['peak_hm0'] < 14 else "phenomenal"
-        hmax_category = "rough" if stats['peak_hmax'] < 4 else "very rough" if stats['peak_hmax'] < 6 else "high" if stats['peak_hmax'] < 9 else "very high" if stats['peak_hmax'] < 14 else "phenomenal"
         
         return f"""
 **Significant Wave Heights (Hm0):** Peak values reached **{stats['peak_hm0']:.1f} m**, representing **{hm0_category}** sea states according to the World Meteorological Organization classification.
 
-**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **{stats['peak_hmax']:.1f} m**, representing **{hmax_category}** conditions for maximum wave heights.
+**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **{stats['peak_hmax']:.1f} m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
 **Wave Height Relationship:** The Hmax/Hm0 ratio was **{stats['peak_hmax']/stats['peak_hm0']:.2f}**, {"within normal range (1.3-1.8)" if 1.3 <= stats['peak_hmax']/stats['peak_hm0'] <= 1.8 else "indicating extreme wave conditions" if stats['peak_hmax']/stats['peak_hm0'] > 1.8 else "unusually low for storm conditions"}.
 
@@ -664,13 +735,7 @@ The storm produced maximum sustained winds of **{stats['peak_wind_speed']:.1f} m
         """Format pressure analysis section"""
         pressure_drop = 1013.25 - stats['min_pressure']  # From standard pressure
         return f"""
-Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**, representing a pressure anomaly of {pressure_drop:.1f} hPa below standard atmospheric pressure (1013.25 hPa).
-
-**Pressure Categories:**
-- Normal: 1013-1023 hPa
-- Low: 1000-1013 hPa
-- Very Low: 980-1000 hPa  
-- Extremely Low: <980 hPa
+Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**.
 """
 
     def _format_storm_timeline(self, storm_data):

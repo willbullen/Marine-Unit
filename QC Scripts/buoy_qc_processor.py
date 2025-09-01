@@ -39,7 +39,76 @@ class BuoyQCProcessor:
         self.output_dir = output_dir
         self.scripts_dir = scripts_dir
         
-        # QC thresholds based on physical limits and station-specific conditions
+        # Load QC limits from CSV file
+        self.default_qc_limits = {}
+        self.station_qc_limits = {}
+        self.load_qc_limits_from_csv()
+        
+        # Load logger information to determine which logger was live
+        self.logger_info = {}
+        self.load_logger_information()
+        
+        # Key parameters for visualization
+        self.key_parameters = [
+            'airpressure', 'airtemp', 'humidity', 'windsp', 'winddir', 
+            'hm0', 'hmax', 'tp', 'mdir', 'seatemp_aa'
+        ]
+    
+    def load_qc_limits_from_csv(self):
+        """Load QC limits from CSV file in Buoy Data folder"""
+        qc_limits_file = os.path.join(self.input_dir, "qc_limits.csv")
+        
+        try:
+            if not os.path.exists(qc_limits_file):
+                print(f"Warning: QC limits file not found at {qc_limits_file}")
+                print("Using fallback hardcoded limits...")
+                self._load_fallback_limits()
+                return
+            
+            print(f"Loading QC limits from {qc_limits_file}...")
+            df = pd.read_csv(qc_limits_file)
+            
+            # Initialize dictionaries
+            self.default_qc_limits = {}
+            self.station_qc_limits = {}
+            
+            # Process each row
+            for _, row in df.iterrows():
+                param = row['parameter']
+                station = row['station']
+                min_val = float(row['min_value']) if pd.notna(row['min_value']) else None
+                max_val = float(row['max_value']) if pd.notna(row['max_value']) else None
+                spike_threshold = float(row['spike_threshold']) if pd.notna(row['spike_threshold']) else None
+                
+                # Build limits dictionary for this parameter
+                limits = {}
+                if min_val is not None:
+                    limits['min'] = min_val
+                if max_val is not None:
+                    limits['max'] = max_val
+                if spike_threshold is not None:
+                    limits['spike_threshold'] = spike_threshold
+                
+                # Store in appropriate dictionary
+                if station == 'default':
+                    self.default_qc_limits[param] = limits
+                else:
+                    if station not in self.station_qc_limits:
+                        self.station_qc_limits[station] = {}
+                    self.station_qc_limits[station][param] = limits
+            
+            print(f"Loaded QC limits: {len(self.default_qc_limits)} default parameters, "
+                  f"{len(self.station_qc_limits)} stations with custom limits")
+            
+        except Exception as e:
+            print(f"Error loading QC limits from CSV: {e}")
+            print("Using fallback hardcoded limits...")
+            self._load_fallback_limits()
+    
+    def _load_fallback_limits(self):
+        """Load fallback hardcoded QC limits if CSV loading fails"""
+        print("Loading fallback hardcoded QC limits...")
+        
         # Default limits applied to all stations unless overridden
         self.default_qc_limits = {
             'airpressure': {'min': 950.0, 'max': 1050.0, 'spike_threshold': 10.0},
@@ -58,20 +127,19 @@ class BuoyQCProcessor:
         }
         
         # Station-specific QC limits (overrides defaults where specified)
-        # Based on location, exposure, and typical environmental conditions
         self.station_qc_limits = {
             '62091': {  # More exposed Atlantic location
-                'hm0': {'min': 0.0, 'max': 18.0, 'spike_threshold': 4.0},  # Higher wave limits
-                'hmax': {'min': 0.0, 'max': 30.0, 'spike_threshold': 6.0},  # Higher max waves
-                'windsp': {'min': 0.0, 'max': 60.0, 'spike_threshold': 20.0},  # Higher wind limits
+                'hm0': {'min': 0.0, 'max': 18.0, 'spike_threshold': 4.0},
+                'hmax': {'min': 0.0, 'max': 30.0, 'spike_threshold': 6.0},
+                'windsp': {'min': 0.0, 'max': 60.0, 'spike_threshold': 20.0},
                 'windgust': {'min': 0.0, 'max': 80.0, 'spike_threshold': 25.0},
-                'seatemp_aa': {'min': 4.0, 'max': 18.0, 'spike_threshold': 2.0}  # Atlantic temps
+                'seatemp_aa': {'min': 4.0, 'max': 18.0, 'spike_threshold': 2.0}
             },
             '62092': {  # Coastal/sheltered location
-                'hm0': {'min': 0.0, 'max': 12.0, 'spike_threshold': 2.5},  # Lower wave limits
+                'hm0': {'min': 0.0, 'max': 12.0, 'spike_threshold': 2.5},
                 'hmax': {'min': 0.0, 'max': 20.0, 'spike_threshold': 4.0},
-                'seatemp_aa': {'min': 6.0, 'max': 20.0, 'spike_threshold': 2.5},  # Warmer coastal temps
-                'salinity_16': {'min': 25.0, 'max': 35.0, 'spike_threshold': 3.0}  # Coastal salinity
+                'seatemp_aa': {'min': 6.0, 'max': 20.0, 'spike_threshold': 2.5},
+                'salinity_16': {'min': 25.0, 'max': 35.0, 'spike_threshold': 3.0}
             },
             '62093': {  # Intermediate exposure
                 'hm0': {'min': 0.0, 'max': 15.0, 'spike_threshold': 3.5},
@@ -85,22 +153,198 @@ class BuoyQCProcessor:
                 'seatemp_aa': {'min': 4.5, 'max': 18.5, 'spike_threshold': 2.5}
             },
             '62095': {  # Unique location with specific characteristics
-                'airtemp': {'min': -15.0, 'max': 35.0, 'spike_threshold': 4.0},  # Different temp range
+                'airtemp': {'min': -15.0, 'max': 35.0, 'spike_threshold': 4.0},
                 'hm0': {'min': 0.0, 'max': 14.0, 'spike_threshold': 3.0},
                 'hmax': {'min': 0.0, 'max': 22.0, 'spike_threshold': 4.5},
                 'seatemp_aa': {'min': 6.0, 'max': 19.0, 'spike_threshold': 2.0}
             }
         }
         
-        # Key parameters for visualization
-        self.key_parameters = [
-            'airpressure', 'airtemp', 'humidity', 'windsp', 'winddir', 
-            'hm0', 'hmax', 'tp', 'mdir', 'seatemp_aa'
-        ]
+        print("Fallback limits loaded successfully")
+    
+    def load_logger_information(self):
+        """Load logger information from imdbon_log_of_loggers.csv to determine live loggers"""
+        logger_file = os.path.join(self.input_dir, "imdbon_log_of_loggers.csv")
+        
+        try:
+            if not os.path.exists(logger_file):
+                print(f"Warning: Logger information file not found at {logger_file}")
+                print("Will process all data without logger filtering...")
+                return
+            
+            print(f"Loading logger information from {logger_file}...")
+            df = pd.read_csv(logger_file)
+            
+            # Process each logger entry
+            for _, row in df.iterrows():
+                station = str(row['Buoy'])
+                logger_id = str(row['Loggerid']).strip()
+                start_time = pd.to_datetime(row['Start'], format='%d/%m/%Y %H:%M', errors='coerce')
+                end_time = pd.to_datetime(row['End'], format='%d/%m/%Y %H:%M', errors='coerce') if pd.notna(row['End']) else None
+                is_live = bool(row['Live'])
+                live_wave = bool(row['Live_wave']) if pd.notna(row['Live_wave']) else False
+                
+                if pd.isna(start_time):
+                    print(f"Warning: Invalid start time for {station} - {logger_id}")
+                    continue
+                
+                # Initialize station entry if not exists
+                if station not in self.logger_info:
+                    self.logger_info[station] = []
+                
+                # Add logger entry
+                logger_entry = {
+                    'logger_id': logger_id,
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'is_live': is_live,
+                    'live_wave': live_wave,
+                    'comment': str(row['Comment']) if pd.notna(row['Comment']) else ''
+                }
+                
+                self.logger_info[station].append(logger_entry)
+            
+            # Sort each station's loggers by start time
+            for station in self.logger_info:
+                self.logger_info[station].sort(key=lambda x: x['start_time'])
+            
+            print(f"Loaded logger information for {len(self.logger_info)} stations")
+            
+        except Exception as e:
+            print(f"Error loading logger information: {e}")
+            print("Will process all data without logger filtering...")
+    
+    def get_live_logger_for_time(self, station, target_time):
+        """Get the logger that was live for a specific station and time"""
+        if station not in self.logger_info:
+            return None
+        
+        target_time = pd.to_datetime(target_time)
+        
+        for logger_entry in self.logger_info[station]:
+            start_time = logger_entry['start_time']
+            end_time = logger_entry['end_time']
+            
+            # Check if target time falls within this logger's active period
+            if target_time >= start_time:
+                if end_time is None or target_time <= end_time:
+                    if logger_entry['is_live']:
+                        return logger_entry
+        
+        return None
+    
+    def get_live_logger_for_period(self, station, start_time, end_time):
+        """Get the logger that was live for the majority of a time period"""
+        if station not in self.logger_info:
+            return None
+        
+        start_time = pd.to_datetime(start_time)
+        end_time = pd.to_datetime(end_time)
+        
+        # Find logger that covers the majority of the time period
+        best_logger = None
+        best_coverage = 0
+        
+        for logger_entry in self.logger_info[station]:
+            if not logger_entry['is_live']:
+                continue
+                
+            logger_start = logger_entry['start_time']
+            logger_end = logger_entry['end_time'] if logger_entry['end_time'] is not None else end_time
+            
+            # Calculate overlap
+            overlap_start = max(start_time, logger_start)
+            overlap_end = min(end_time, logger_end)
+            
+            if overlap_start < overlap_end:
+                overlap_duration = (overlap_end - overlap_start).total_seconds()
+                period_duration = (end_time - start_time).total_seconds()
+                coverage = overlap_duration / period_duration
+                
+                if coverage > best_coverage:
+                    best_coverage = coverage
+                    best_logger = logger_entry
+        
+        return best_logger if best_coverage > 0.5 else None
+    
+    def save_qc_limits_to_csv(self, output_file=None):
+        """Save current QC limits back to CSV file"""
+        if output_file is None:
+            output_file = os.path.join(self.input_dir, "qc_limits.csv")
+        
+        try:
+            # Prepare data for CSV
+            csv_data = []
+            
+            # Add default limits
+            for param, limits in self.default_qc_limits.items():
+                row = {
+                    'parameter': param,
+                    'station': 'default',
+                    'min_value': limits.get('min', ''),
+                    'max_value': limits.get('max', ''),
+                    'spike_threshold': limits.get('spike_threshold', ''),
+                    'notes': f'Default limits for {param}'
+                }
+                csv_data.append(row)
+            
+            # Add station-specific limits
+            for station, station_limits in self.station_qc_limits.items():
+                for param, limits in station_limits.items():
+                    row = {
+                        'parameter': param,
+                        'station': station,
+                        'min_value': limits.get('min', ''),
+                        'max_value': limits.get('max', ''),
+                        'spike_threshold': limits.get('spike_threshold', ''),
+                        'notes': f'Station {station} specific limits for {param}'
+                    }
+                    csv_data.append(row)
+            
+            # Create DataFrame and save
+            df = pd.DataFrame(csv_data)
+            df.to_csv(output_file, index=False)
+            print(f"QC limits saved to {output_file}")
+            return True
+            
+        except Exception as e:
+            print(f"Error saving QC limits to CSV: {e}")
+            return False
+    
+    def display_qc_limits(self):
+        """Display current QC limits for verification"""
+        print("\n=== CURRENT QC LIMITS ===")
+        print("\nDefault Limits:")
+        for param, limits in self.default_qc_limits.items():
+            min_val = limits.get('min', 'N/A')
+            max_val = limits.get('max', 'N/A')
+            spike_val = limits.get('spike_threshold', 'N/A')
+            print(f"  {param}: min={min_val}, max={max_val}, spike_threshold={spike_val}")
+        
+        print("\nStation-Specific Limits:")
+        for station, station_limits in self.station_qc_limits.items():
+            print(f"  Station {station}:")
+            for param, limits in station_limits.items():
+                min_val = limits.get('min', 'N/A')
+                max_val = limits.get('max', 'N/A')
+                spike_val = limits.get('spike_threshold', 'N/A')
+                print(f"    {param}: min={min_val}, max={max_val}, spike_threshold={spike_val}")
+        print("=" * 30)
+        
+        # Display logger information if available
+        if self.logger_info:
+            print(f"\nLogger Information:")
+            for station, loggers in self.logger_info.items():
+                live_loggers = [lg for lg in loggers if lg['is_live']]
+                if live_loggers:
+                    print(f"  Station {station}: {len(live_loggers)} live loggers")
+                    for logger in live_loggers:
+                        end_str = logger['end_time'].strftime('%Y-%m-%d') if logger['end_time'] else 'Present'
+                        print(f"    {logger['logger_id']}: {logger['start_time'].strftime('%Y-%m-%d')} to {end_str}")
         
     def get_buoy_files_by_year(self):
         """Get all buoy data files grouped by station and year"""
-        files = [f for f in os.listdir(self.input_dir) if f.endswith('.csv')]
+        files = [f for f in os.listdir(self.input_dir) if f.endswith('.csv') and 'zzqc_fugrobuoy' in f]
         buoy_year_groups = {}
         
         for file in files:
@@ -120,7 +364,7 @@ class BuoyQCProcessor:
         return buoy_year_groups
     
     def load_buoy_year_data(self, station, year, files):
-        """Load data for a specific buoy station and year"""
+        """Load data for a specific buoy station and year, filtered by live logger"""
         print(f"  Processing {station} - {year}...")
         
         combined_data = []
@@ -149,6 +393,31 @@ class BuoyQCProcessor:
         combined_df = combined_df.sort_values('time').reset_index(drop=True)
         
         print(f"    Combined: {len(combined_df):,} records from {combined_df['time'].min()} to {combined_df['time'].max()}")
+        
+        # Filter data to only include records from the live logger
+        if self.logger_info and station in self.logger_info:
+            live_logger = self.get_live_logger_for_period(station, combined_df['time'].min(), combined_df['time'].max())
+            
+            if live_logger:
+                print(f"    Live logger for period: {live_logger['logger_id']} (Live: {live_logger['is_live']}, Wave: {live_logger['live_wave']})")
+                
+                # Filter data to only include records from the live logger
+                if 'loggerid' in combined_df.columns:
+                    # Filter by logger ID
+                    live_logger_id = live_logger['logger_id'].split('_')[0]  # Extract numeric part
+                    filtered_df = combined_df[combined_df['loggerid'].str.contains(live_logger_id, na=False)]
+                    
+                    if len(filtered_df) > 0:
+                        print(f"    Filtered to live logger data: {len(filtered_df):,} records")
+                        combined_df = filtered_df.reset_index(drop=True)
+                    else:
+                        print(f"    Warning: No data found for live logger {live_logger['logger_id']}")
+                else:
+                    print(f"    Warning: No loggerid column found, cannot filter by live logger")
+            else:
+                print(f"    Warning: No live logger found for the time period")
+        else:
+            print(f"    No logger information available, processing all data")
         
         return combined_df
     
@@ -375,7 +644,15 @@ class BuoyQCProcessor:
         
         # Create subplots for different parameter groups
         fig, axes = plt.subplots(3, 2, figsize=(15, 12))
-        fig.suptitle(f'Buoy {station} - {year} Data Overview and QC Results', fontsize=16, fontweight='bold')
+        
+        # Create title with logger information
+        title = f'Buoy {station} - {year} Data Overview and QC Results'
+        if self.logger_info and station in self.logger_info:
+            live_logger = self.get_live_logger_for_period(station, df['time'].min(), df['time'].max())
+            if live_logger:
+                title += f'\nLive Logger: {live_logger["logger_id"]}'
+        
+        fig.suptitle(title, fontsize=16, fontweight='bold')
         
         # Convert time for plotting
         df['time'] = pd.to_datetime(df['time'])
@@ -487,6 +764,24 @@ class BuoyQCProcessor:
             for logger, count in loggers.items():
                 pct = (count/len(df))*100
                 f.write(f"  - {logger.strip()}: {count:,} records ({pct:.1f}%)\n")
+            
+            # Logger information
+            if self.logger_info and station in self.logger_info:
+                live_logger = self.get_live_logger_for_period(station, df['time'].min(), df['time'].max())
+                if live_logger:
+                    f.write(f"- **Live Logger Used:** {live_logger['logger_id']}\n")
+                    f.write(f"  - Active Period: {live_logger['start_time'].strftime('%Y-%m-%d %H:%M')} to ")
+                    if live_logger['end_time']:
+                        f.write(f"{live_logger['end_time'].strftime('%Y-%m-%d %H:%M')}\n")
+                    else:
+                        f.write("Present\n")
+                    f.write(f"  - Wave Data Available: {'Yes' if live_logger['live_wave'] else 'No'}\n")
+                    if live_logger['comment']:
+                        f.write(f"  - Notes: {live_logger['comment']}\n")
+                else:
+                    f.write("- **Live Logger:** None identified for this time period\n")
+            else:
+                f.write("- **Live Logger:** Information not available\n")
             
             f.write("\n")
             
@@ -727,6 +1022,26 @@ class BuoyQCProcessor:
                 ]))
                 story.append(table)
             
+            # Add logger information
+            if self.logger_info and station in self.logger_info:
+                live_logger = self.get_live_logger_for_period(station, df['time'].min(), df['time'].max())
+                if live_logger:
+                    story.append(Spacer(1, 20))
+                    story.append(Paragraph("Live Logger Information", heading_style))
+                    
+                    logger_text = f"• <b>Logger ID:</b> {live_logger['logger_id']}<br/>"
+                    logger_text += f"• <b>Active Period:</b> {live_logger['start_time'].strftime('%Y-%m-%d %H:%M')} to "
+                    if live_logger['end_time']:
+                        logger_text += f"{live_logger['end_time'].strftime('%Y-%m-%d %H:%M')}"
+                    else:
+                        logger_text += "Present"
+                    logger_text += f"<br/>• <b>Wave Data:</b> {'Available' if live_logger['live_wave'] else 'Not Available'}"
+                    
+                    if live_logger['comment']:
+                        logger_text += f"<br/>• <b>Notes:</b> {live_logger['comment']}"
+                    
+                    story.append(Paragraph(logger_text, styles['Normal']))
+            
             # Add visualization image if it exists
             plot_file = os.path.join(self.output_dir, f'buoy_{station}_{year}_qc_overview.png')
             if os.path.exists(plot_file):
@@ -760,6 +1075,28 @@ class BuoyQCProcessor:
         """Main processing function - process all buoy stations by year"""
         print("Starting Buoy QC Processing by Year...")
         print("=" * 50)
+        
+        # Display QC limits source and current values
+        qc_limits_file = os.path.join(self.input_dir, "qc_limits.csv")
+        if os.path.exists(qc_limits_file):
+            print(f"QC limits loaded from: {qc_limits_file}")
+        else:
+            print("QC limits loaded from: Fallback hardcoded values")
+        
+        # Display current QC limits for verification
+        self.display_qc_limits()
+        
+        # Display logger information summary
+        if self.logger_info:
+            print(f"\nLogger Information Summary:")
+            for station, loggers in self.logger_info.items():
+                live_loggers = [lg for lg in loggers if lg['is_live']]
+                print(f"  Station {station}: {len(live_loggers)} live loggers")
+                for logger in live_loggers:
+                    end_str = logger['end_time'].strftime('%Y-%m-%d') if logger['end_time'] else 'Present'
+                    print(f"    {logger['logger_id']}: {logger['start_time'].strftime('%Y-%m-%d')} to {end_str}")
+        else:
+            print(f"\nNo logger information available")
         
         # Get all buoy files grouped by station and year
         buoy_year_groups = self.get_buoy_files_by_year()

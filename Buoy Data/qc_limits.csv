@@ -1,0 +1,34 @@
+parameter,station,min_value,max_value,spike_threshold,notes
+airpressure,default,950.0,1050.0,10.0,Standard atmospheric pressure range with reasonable spike threshold
+airtemp,default,-20.0,40.0,5.0,Reasonable air temperature range for marine environments
+humidity,default,0.0,100.0,20.0,Relative humidity percentage with spike detection
+seatemp_16,default,-2.0,30.0,3.0,Sea temperature from 16m depth sensor
+seatemp_aa,default,-2.0,30.0,3.0,Sea temperature from AA sensor
+windsp,default,0.0,50.0,15.0,Wind speed with spike detection for gusts
+windgust,default,0.0,60.0,20.0,Wind gust speed (typically higher than sustained)
+winddir,default,0.0,360.0,180.0,Wind direction in degrees
+hm0,default,0.0,15.0,3.0,Significant wave height
+hmax,default,0.0,25.0,5.0,Maximum wave height
+tp,default,1.0,25.0,10.0,Wave period
+mdir,default,0.0,360.0,180.0,Mean wave direction
+salinity_16,default,20.0,40.0,5.0,Salinity from 16m depth sensor
+hm0,62091,0.0,18.0,4.0,More exposed Atlantic location - higher wave limits
+hmax,62091,0.0,30.0,6.0,More exposed Atlantic location - higher max waves
+windsp,62091,0.0,60.0,20.0,More exposed Atlantic location - higher wind limits
+windgust,62091,0.0,80.0,25.0,More exposed Atlantic location - higher gust limits
+seatemp_aa,62091,4.0,18.0,2.0,Atlantic temperatures - more stable range
+hm0,62092,0.0,12.0,2.5,Coastal/sheltered location - lower wave limits
+hmax,62092,0.0,20.0,4.0,Coastal/sheltered location - lower max waves
+seatemp_aa,62092,6.0,20.0,2.5,Warmer coastal temperatures
+salinity_16,62092,25.0,35.0,3.0,Coastal salinity - more variable
+hm0,62093,0.0,15.0,3.5,Intermediate exposure - moderate wave limits
+hmax,62093,0.0,25.0,5.0,Intermediate exposure - moderate max waves
+seatemp_aa,62093,5.0,19.0,2.5,Intermediate temperature range
+hm0,62094,0.0,16.0,3.5,Similar to 62093 but slightly different conditions
+hmax,62094,0.0,26.0,5.5,Similar to 62093 but slightly different conditions
+windsp,62094,0.0,55.0,18.0,Similar to 62093 but slightly different conditions
+seatemp_aa,62094,4.5,18.5,2.5,Similar to 62093 but slightly different conditions
+airtemp,62095,-15.0,35.0,4.0,Unique location with different temperature range
+hm0,62095,0.0,14.0,3.0,Unique location with specific characteristics
+hmax,62095,0.0,22.0,4.5,Unique location with specific characteristics
+seatemp_aa,62095,6.0,19.0,2.0,Unique location with specific characteristics

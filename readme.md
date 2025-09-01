@@ -74,6 +74,63 @@ The system uses standardized QC indicator values for all parameters:
 
 **Note**: The system automatically assigns indicators `0` (data available) and `9` (data missing).
 
+### QC Limits Configuration
+
+The system now uses a CSV-based configuration file for all QC limits, making it easy to modify thresholds without changing code:
+
+**File Location**: `Buoy Data/qc_limits.csv`
+
+**CSV Structure**:
+- `parameter`: Parameter name (e.g., hm0, airtemp, windsp)
+- `station`: Station ID or "default" for global limits
+- `min_value`: Minimum acceptable value
+- `max_value`: Maximum acceptable value  
+- `spike_threshold`: Maximum allowed change between consecutive values
+- `notes`: Description of the limit and reasoning
+
+**Benefits**:
+- **Maintainable**: Update limits without touching Python code
+- **Version Controlled**: Track changes to QC parameters in git
+- **Flexible**: Different users can modify limits easily
+- **Documented**: Clear reference for what limits are applied
+
+**Fallback System**: If the CSV file is missing or corrupted, the system automatically falls back to hardcoded limits to ensure continued operation.
+
+**Management Tools**:
+- `QC Scripts/manage_qc_limits.py`: Interactive utility to view/edit limits
+- `QC Scripts/test_qc_limits.py`: Test script to verify CSV loading
+
+### Live Logger Filtering
+
+The system automatically filters data to only include records from the logger that was actually live/active during each time period. This is based on the `Buoy Data/imdbon_log_of_loggers.csv` file.
+
+**Logger CSV Structure**:
+- `Buoy`: Station ID (e.g., 62091, 62092)
+- `Loggerid`: Logger identifier (e.g., 347_Wavesense, 8704_CR6)
+- `Start`: Start time of logger operation (DD/MM/YYYY HH:MM)
+- `End`: End time of logger operation (DD/MM/YYYY HH:MM) or empty if still active
+- `Live`: Whether logger is live (1) or inactive (0)
+- `Live_wave`: Whether wave data is available (1) or not (0)
+- `Comment`: Additional notes about the logger
+
+**Benefits of Logger Filtering**:
+- **Accurate QC Results**: Only processes data from the active logger
+- **Better Data Quality**: Eliminates confusion from multiple loggers
+- **Proper Attribution**: Reports clearly show which logger was used
+- **Historical Accuracy**: Reflects the actual operational status
+
+**Example Logger Entry**:
+```csv
+62091,347_Wavesense,11/02/2022 11:00,23/02/2024 19:00,1,9,17797,17797,
+62091,8704_CR6,07/03/2022 08:00,23/02/2024 19:00,0,6,16255,16255,
+```
+
+The system automatically:
+1. Loads logger information at startup
+2. Identifies the live logger for each time period
+3. Filters data to only include records from the live logger
+4. Reports which logger was used in all outputs
+
 ### Sensor Configuration
 
 #### Environmental Sensors
@@ -119,10 +176,16 @@ Standard QC applies to the following parameters:
 ### QC Output Generated
 The system generates separate files for each buoy station and year:
 
-- **`QC Data/buoy_STATION_YEAR_qcd.csv`**: QC'd data files (e.g., `buoy_62091_2023_qcd.csv`)
-- **`QC Data/buoy_STATION_YEAR_qc_report.md`**: Detailed QC analysis reports for each year (markdown)
-- **`QC Data/buoy_STATION_YEAR_qc_report.pdf`**: Professional PDF reports with embedded visualizations
-- **`QC Data/buoy_STATION_YEAR_qc_overview.png`**: Color-coded data visualization plots for each year
+- **`QC Data/buoy_STATION_YEAR_qcd.csv`**: QC'd data files (e.g., `buoy_62091_2023_qcd.csv`) - **Only contains data from the live logger**
+- **`QC Data/buoy_STATION_YEAR_qc_report.md`**: Detailed QC analysis reports for each year (markdown) - **Includes live logger information**
+- **`QC Data/buoy_STATION_YEAR_qc_report.pdf`**: Professional PDF reports with embedded visualizations - **Shows which logger was used**
+- **`QC Data/buoy_STATION_YEAR_qc_overview.png`**: Color-coded data visualization plots for each year - **Title includes live logger ID**
+
+**Logger Information in Reports**:
+- Which logger was active during the time period
+- Start and end dates of logger operation
+- Whether wave data was available
+- Any operational notes or comments
 
 ## Marine Storm Analysis System
 

@@ -1,6 +1,6 @@
 # Storm Debi - Marine Storm Report
 
-**Report Generated:** 2025-08-20 13:41:39
+**Report Generated:** 2025-08-25 13:36:30
 
 ## Storm Overview
 
@@ -15,15 +15,15 @@
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62091** (M1 Buoy): 53.47°N, 5.42°W - West Coast
+- **Buoy 62091** (M1 Buoy (Retired)): 53.47°N, 5.42°W - West Coast
 - **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W - West Coast
-- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W - Southwest Coast
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W - Southwest Coast
+- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W - South Coast
+- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W - South Coast
 - **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W - West Coast
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 39.8 m/s (143.1 km/h) at Buoy 62091
+- **Maximum Wind Speed:** 20.4 m/s (73.6 km/h) at Buoy 62091
 - **Maximum Significant Wave Height (Hm0):** 6.1 m at Buoy 62095
 - **Maximum Wave Height (Hmax):** 10.3 m at Buoy 62095
 - **Minimum Pressure:** 979.0 hPa at Buoy 62091
@@ -33,10 +33,10 @@
 
 ### Station-by-Station Analysis
 
-### Buoy 62091 - M1 Buoy
+### Buoy 62091 - M1 Buoy (Retired)
 - **Location:** 53.47°N, 5.42°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 39.8 m/s (143.1 km/h)
+- **Peak Wind Speed:** 20.4 m/s (73.6 km/h)
 - **Peak Significant Wave Height (Hm0):** 3.8 m  
 - **Peak Maximum Wave Height (Hmax):** 6.9 m
 - **Minimum Pressure:** 979.0 hPa
@@ -47,7 +47,7 @@
 ### Buoy 62092 - M2 Buoy
 - **Location:** 53.48°N, 5.42°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 33.6 m/s (121.0 km/h)
+- **Peak Wind Speed:** 17.3 m/s (62.2 km/h)
 - **Peak Significant Wave Height (Hm0):** 6.0 m  
 - **Peak Maximum Wave Height (Hmax):** 10.0 m
 - **Minimum Pressure:** 983.5 hPa
@@ -57,8 +57,8 @@
 
 ### Buoy 62093 - M3 Buoy
 - **Location:** 51.22°N, 6.70°W
-- **Region:** Southwest Coast
-- **Peak Wind Speed:** 28.5 m/s (102.5 km/h)
+- **Region:** South Coast
+- **Peak Wind Speed:** 14.6 m/s (52.7 km/h)
 - **Peak Significant Wave Height (Hm0):** 5.1 m  
 - **Peak Maximum Wave Height (Hmax):** 9.8 m
 - **Minimum Pressure:** 980.7 hPa
@@ -68,8 +68,8 @@
 
 ### Buoy 62094 - M4 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Region:** Southwest Coast
-- **Peak Wind Speed:** 33.9 m/s (122.2 km/h)
+- **Region:** South Coast
+- **Peak Wind Speed:** 17.5 m/s (62.9 km/h)
 - **Peak Significant Wave Height (Hm0):** 5.7 m  
 - **Peak Maximum Wave Height (Hmax):** 9.1 m
 - **Minimum Pressure:** 986.2 hPa
@@ -80,7 +80,7 @@
 ### Buoy 62095 - M5 Buoy
 - **Location:** 53.06°N, 7.90°W
 - **Region:** West Coast
-- **Peak Wind Speed:** 26.1 m/s (93.9 km/h)
+- **Peak Wind Speed:** 13.4 m/s (48.3 km/h)
 - **Peak Significant Wave Height (Hm0):** 6.1 m  
 - **Peak Maximum Wave Height (Hmax):** 10.3 m
 - **Minimum Pressure:** 982.5 hPa
@@ -92,7 +92,7 @@
 
 ### Wind Analysis
 
-The storm produced maximum sustained winds of **39.8 m/s** (143.1 km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
+The storm produced maximum sustained winds of **20.4 m/s** (73.6 km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
 
 **Wind Categories:**
 - Force 7 (Strong Gale): 13.9-17.1 m/s (50-61 km/h)
@@ -105,7 +105,7 @@ The storm produced maximum sustained winds of **39.8 m/s** (143.1 km/h), represe
 
 **Significant Wave Heights (Hm0):** Peak values reached **6.1 m**, representing **high** sea states according to the World Meteorological Organization classification.
 
-**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **10.3 m**, representing **very high** conditions for maximum wave heights.
+**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **10.3 m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
 **Wave Height Relationship:** The Hmax/Hm0 ratio was **1.69**, within normal range (1.3-1.8).
 
@@ -166,8 +166,7 @@ Atmospheric pressure dropped to a minimum of **979.0 hPa**, representing a press
 
 ### QC Methods Applied
 - **Manual QC:** Visual inspection and expert validation
-- **Automatic QC:** Range checks, spike detection, and flat-line identification  
-- **AI-powered QC:** Machine learning algorithms for anomaly detection
+- **Automatic QC:** Range checks, spike detection, and flat-line identification
 
 ### Data Quality Indicators
 - 0: No QC performed
@@ -176,12 +175,6 @@ Atmospheric pressure dropped to a minimum of **979.0 hPa**, representing a press
 - 5: QC performed, raw data not OK but value adjusted/interpolated
 - 6: QC performed, data OK (Datawell Hmax sensor specific)
 - 9: Data missing
-
-### Measurement Uncertainties
-- Wind Speed: ±0.3 m/s
-- Wave Height: ±5% or 0.5m (whichever greater)
-- Atmospheric Pressure: ±0.5 hPa
-- Air Temperature: ±0.2°C
 
 ---
 
