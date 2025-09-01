@@ -153,6 +153,9 @@ class MarineStormAnalyzer:
             "62094": {"name": "M4 Buoy", "location": "51.69°N, 6.70°W", "status": "active"},
             "62095": {"name": "M5 Buoy", "location": "53.06°N, 7.90°W", "status": "active"}
         }
+        
+        # Initialize logger information
+        self.logger_info = {}
 
     def load_qc_data(self):
         """Load all available QC data files"""
@@ -179,15 +182,75 @@ class MarineStormAnalyzer:
                     print(f"  Error loading {file}: {e}")
         
         print(f"Successfully loaded QC data for {len(self.qc_data)} station-years")
+        
+        # Load logger information
+        self.logger_info = self.load_logger_info()
+
+    def load_logger_info(self):
+        """Load logger information from imdbon_log_of_loggers.csv"""
+        logger_file = self.qc_data_dir.parent / "Buoy Data" / "imdbon_log_of_loggers.csv"
+        logger_info = {}
+        
+        try:
+            if logger_file.exists():
+                df = pd.read_csv(logger_file)
+                df['Start'] = pd.to_datetime(df['Start'], format='%d/%m/%Y %H:%M')
+                df['End'] = pd.to_datetime(df['End'], format='%d/%m/%Y %H:%M', errors='coerce')
+                
+                for _, row in df.iterrows():
+                    buoy = str(row['Buoy'])
+                    if buoy not in logger_info:
+                        logger_info[buoy] = []
+                    
+                    logger_info[buoy].append({
+                        'logger_id': row['Loggerid'],
+                        'start_time': row['Start'],
+                        'end_time': row['End'],
+                        'live': row['Live'],
+                        'live_wave': row['Live_wave'],
+                        'comment': row['Comment'] if pd.notna(row['Comment']) else ''
+                    })
+                
+                print(f"Loaded logger information for {len(logger_info)} buoys")
+            else:
+                print("Logger information file not found")
+                
+        except Exception as e:
+            print(f"Error loading logger information: {e}")
+        
+        return logger_info
+
+    def get_active_logger_during_storm(self, buoy, storm_start, storm_end):
+        """Determine which logger was active during the storm period for a specific buoy"""
+        if buoy not in self.logger_info:
+            return None
+        
+        active_loggers = []
+        for logger in self.logger_info[buoy]:
+            # Check if logger was active during storm period
+            logger_start = logger['start_time']
+            logger_end = logger['end_time'] if pd.notna(logger['end_time']) else pd.Timestamp.now()
+            
+            # Check for overlap between logger period and storm period
+            if (logger_start <= storm_end and logger_end >= storm_start):
+                active_loggers.append({
+                    'logger_id': logger['logger_id'],
+                    'live': logger['live'],
+                    'live_wave': logger['live_wave'],
+                    'comment': logger['comment'],
+                    'overlap_start': max(logger_start, storm_start),
+                    'overlap_end': min(logger_end, storm_end)
+                })
+        
+        return active_loggers
 
     def assess_storm_severity(self, stats):
         """Assess storm severity based on meteorological criteria"""
-        # Convert wind speed from knots to m/s for severity assessment
-        wind_speed_mps = stats['peak_wind_speed'] * 0.514444  # knots to m/s
+        # Assess storm severity based on wind speed in knots
         
-        if wind_speed_mps < 20.0:  # < 40 knots
+        if stats['peak_wind_speed'] < 40.0:  # < 40 knots
             return "minor"
-        elif wind_speed_mps < 30.0:  # < 60 knots
+        elif stats['peak_wind_speed'] < 60.0:  # < 60 knots
             return "moderate"
         else:
             return "major"
@@ -285,8 +348,8 @@ class MarineStormAnalyzer:
         
         return storm_data
 
-    def create_storm_visualizations(self, storm_name, storm_data, output_dir):
-        """Create comprehensive visualizations for the storm"""
+    def create_storm_visualizations(self, storm_name, storm_data, output_dir, storm_info=None):
+        """Create comprehensive visualizations for the storm using only active logger data"""
         plt.style.use('seaborn-v0_8')
         
         # Create multi-panel storm overview plot
@@ -300,21 +363,40 @@ class MarineStormAnalyzer:
             color = colors[idx % len(colors)]
             label = f"Buoy {station}"
             
-            # Filter data for each parameter based on individual QC indicators
-            good_windsp = df[df['ind_windsp'] == 1]
-            good_hm0 = df[df['ind_hm0'] == 1]
-            good_hmax = df[df['ind_hmax'] == 1]
-            good_pressure = df[df['ind_airpressure'] == 1]
-            good_temp = df[df['ind_airtemp'] == 1]
-            good_tp = df[df['ind_tp'] == 1]
-            good_winddir = df[df['ind_winddir'] == 1]
+            # Filter data to only include records from active loggers during storm period
+            if storm_info and 'info' in storm_info and 'dates' in storm_info['info']:
+                storm_dates = [pd.to_datetime(date) for date in storm_info['info']['dates']]
+                storm_start = min(storm_dates)
+                storm_end = max(storm_dates) + timedelta(days=1)  # Include full end day
+                
+                # Get active loggers for this station during storm period
+                active_loggers = self.get_active_logger_during_storm(station, storm_start, storm_end)
+                if active_loggers:
+                    # Filter data to only include records from active loggers
+                    active_logger_ids = [logger['logger_id'] for logger in active_loggers]
+                    logger_filtered_df = df[df['loggerid'].isin(active_logger_ids)]
+                    print(f"    {station}: Using {len(logger_filtered_df)} records from active loggers: {', '.join(active_logger_ids)}")
+                else:
+                    logger_filtered_df = df
+                    print(f"    {station}: No logger info available, using all {len(df)} records")
+            else:
+                logger_filtered_df = df
+                print(f"    {station}: No storm info available, using all {len(df)} records")
             
-            # Wind Speed (only good data) - Convert from knots to m/s for display
+            # Filter data for each parameter based on individual QC indicators (from active logger data only)
+            good_windsp = logger_filtered_df[logger_filtered_df['ind_windsp'] == 1]
+            good_hm0 = logger_filtered_df[logger_filtered_df['ind_hm0'] == 1]
+            good_hmax = logger_filtered_df[logger_filtered_df['ind_hmax'] == 1]
+            good_pressure = logger_filtered_df[logger_filtered_df['ind_airpressure'] == 1]
+            good_temp = logger_filtered_df[logger_filtered_df['ind_airtemp'] == 1]
+            good_tp = logger_filtered_df[logger_filtered_df['ind_tp'] == 1]
+            good_winddir = logger_filtered_df[logger_filtered_df['ind_winddir'] == 1]
+            
+            # Wind Speed (only good data) - Display in knots
             if not good_windsp.empty:
-                wind_speed_mps = good_windsp['windsp'] * 0.514444  # knots to m/s
-                axes[0, 0].plot(good_windsp['time'], wind_speed_mps, color=color, label=label, alpha=0.8, linewidth=2)
-            axes[0, 0].set_title('Wind Speed (m/s) - QC Good Data Only', fontsize=12, fontweight='bold')
-            axes[0, 0].set_ylabel('Wind Speed (m/s)')
+                axes[0, 0].plot(good_windsp['time'], good_windsp['windsp'], color=color, label=label, alpha=0.8, linewidth=2)
+            axes[0, 0].set_title('Wind Speed (knots) - QC Good Data Only', fontsize=12, fontweight='bold')
+            axes[0, 0].set_ylabel('Wind Speed (knots)')
             axes[0, 0].grid(True, alpha=0.3)
             axes[0, 0].legend()
             
@@ -363,10 +445,9 @@ class MarineStormAnalyzer:
                 # Match wind direction with wind speed data
                 wind_combined = df[(df['ind_winddir'] == 1) & (df['ind_windsp'] == 1)]
                 if not wind_combined.empty:
-                    # Convert wind speed from knots to m/s for color mapping
-                    wind_speed_mps = wind_combined['windsp'] * 0.514444
+                    # Use wind speed in knots for color mapping
                     scatter = axes[3, 0].scatter(wind_combined['time'], wind_combined['winddir'], 
-                                               c=wind_speed_mps, cmap='viridis', alpha=0.7, s=30, label=label)
+                                               c=wind_combined['windsp'], cmap='viridis', alpha=0.7, s=30, label=label)
             axes[3, 0].set_title('Wind Direction (colored by speed) - QC Good Data Only', fontsize=12, fontweight='bold')
             axes[3, 0].set_ylabel('Wind Direction (°)')
             axes[3, 0].grid(True, alpha=0.3)
@@ -383,7 +464,7 @@ class MarineStormAnalyzer:
         
         # Add colorbar for wind direction plot
         if len(storm_data) > 0:
-            plt.colorbar(scatter, ax=axes[3, 0], label='Wind Speed (m/s)')
+            plt.colorbar(scatter, ax=axes[3, 0], label='Wind Speed (knots)')
         
         # Format x-axis for all subplots
         for ax in axes.flat:
@@ -407,7 +488,7 @@ class MarineStormAnalyzer:
         
         # Create visualizations if not provided
         if overview_plot is None:
-            overview_plot = self.create_storm_visualizations(storm_name, storm_data, output_dir)
+            overview_plot = self.create_storm_visualizations(storm_name, storm_data, output_dir, storm_info)
         
         # Generate markdown content based on severity
         if severity == "minor":
@@ -444,6 +525,8 @@ class MarineStormAnalyzer:
 
 ## Quality Control Summary
 {self._format_qc_summary(storm_data)}
+
+{self._format_qc_data_and_logger_info(storm_data, storm_info)}
 
 ## Data Visualization
 
@@ -503,6 +586,8 @@ class MarineStormAnalyzer:
 
 ## Quality Control Summary
 {self._format_qc_summary(storm_data)}
+
+{self._format_qc_data_and_logger_info(storm_data, storm_info)}
 
 ## Data Visualization
 
@@ -662,7 +747,7 @@ class MarineStormAnalyzer:
     def _format_peak_conditions(self, stats):
         """Format peak conditions section"""
         return f"""
-- **Maximum Wind Speed:** {stats['peak_wind_speed'] * 0.514444:.1f} m/s ({stats['peak_wind_speed'] * 1.852:.1f} km/h) at Buoy {stats['peak_wind_buoy']}
+- **Maximum Wind Speed:** {stats['peak_wind_speed']:.1f} knots ({stats['peak_wind_speed'] * 1.852:.1f} km/h) at Buoy {stats['peak_wind_buoy']}
 - **Maximum Significant Wave Height (Hm0):** {stats['peak_hm0']:.1f} m at Buoy {stats['peak_hm0_buoy']}
 - **Maximum Wave Height (Hmax):** {stats['peak_hmax']:.1f} m at Buoy {stats['peak_hmax_buoy']}
 - **Minimum Pressure:** {stats['min_pressure']:.1f} hPa at Buoy {stats['min_pressure_buoy']}
@@ -683,7 +768,7 @@ class MarineStormAnalyzer:
                 analysis.append(f"""
 ### Buoy {station} - {station_info.get('name', 'Unknown')}
 - **Location:** {station_info.get('location', 'Unknown')}
-- **Peak Wind Speed:** {station_stat['max_wind']} knots ({station_stat['max_wind'] * 1.852:.1f} km/h)
+- **Peak Wind Speed:** {station_stat['max_wind']:.1f} knots ({station_stat['max_wind'] * 1.852:.1f} km/h)
 - **Peak Significant Wave Height (Hm0):** {station_stat['max_hm0']:.1f} m  
 - **Peak Maximum Wave Height (Hmax):** {station_stat['max_hmax']:.1f} m
 - **Minimum Pressure:** {station_stat['min_pressure']:.1f} hPa
@@ -696,7 +781,7 @@ class MarineStormAnalyzer:
     def _format_wind_analysis(self, stats):
         """Format wind analysis section"""
         return f"""
-The storm produced maximum sustained winds of **{stats['peak_wind_speed']} knots** ({stats['peak_wind_speed'] * 1.852:.1f} km/h).
+The storm produced maximum sustained winds of **{stats['peak_wind_speed']:.1f} knots** ({stats['peak_wind_speed'] * 1.852:.1f} km/h).
 
 **Wind Categories:**
 - Force 7 — Near gale: 28–33 kn (50–61 km/h)
@@ -713,7 +798,7 @@ The storm produced maximum sustained winds of **{stats['peak_wind_speed']} knots
         hm0_category = "rough" if stats['peak_hm0'] < 4 else "very rough" if stats['peak_hm0'] < 6 else "high" if stats['peak_hm0'] < 9 else "very high" if stats['peak_hm0'] < 14 else "phenomenal"
         
         return f"""
-**Significant Wave Heights (Hm0):** Peak values reached **{stats['peak_hm0']:.1f} m**, representing **{hm0_category}** sea states according to the World Meteorological Organization classification.
+**Significant Wave Heights (Hm0):** Peak values reached **{stats['peak_hm0']:.1f} m**, representing **{hm0_category}**.
 
 **Maximum Wave Heights (Hmax):** Individual wave heights peaked at **{stats['peak_hmax']:.1f} m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
@@ -785,10 +870,46 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
 **QC Status Distribution:**
 - Good Data (QC=1): {qc_counts[1]:,} records ({qc_counts[1]/total_records*100:.1f}%)
 - Adjusted Data (QC=5): {qc_counts[5]:,} records ({qc_counts[5]/total_records*100:.1f}%)
-- Failed QC (QC=4): {qc_counts[4]:,} records ({qc_counts[4]/total_records*100:.1f}%)
 - Missing Data (QC=9): {qc_counts[9]:,} records ({qc_counts[9]/total_records*100:.1f}%)
 - No QC (QC=0): {qc_counts[0]:,} records ({qc_counts[0]/total_records*100:.1f}%)
 """
+
+    def _format_qc_data_and_logger_info(self, storm_data, storm_info):
+        """Format logger information section"""
+        if not storm_data:
+            return "No QC data available"
+        
+        # Get storm period from storm info
+        storm_dates = [pd.to_datetime(date) for date in storm_info['info']['dates']]
+        storm_start = min(storm_dates)
+        storm_end = max(storm_dates) + timedelta(days=1)  # Include full end day
+        
+        logger_info = []
+        
+        for station_key, df in storm_data.items():
+            station = station_key.split('_')[0]
+            
+            # Get logger information for this station during storm period
+            active_loggers = self.get_active_logger_during_storm(station, storm_start, storm_end)
+            
+            if active_loggers:
+                # Just show the logger ID(s) that were active
+                logger_ids = [logger['logger_id'] for logger in active_loggers]
+                logger_info.append(f"""
+**Buoy {station} ({self.buoy_stations.get(station, {}).get('name', 'Unknown')}):**
+- Logger(s) used: {', '.join(logger_ids)}""")
+            else:
+                logger_info.append(f"""
+**Buoy {station} ({self.buoy_stations.get(station, {}).get('name', 'Unknown')}):**
+- No logger information available for this period""")
+        
+        return f"""
+## Data Sources and Logger Information
+
+### Active Logger Information During Storm Period
+{chr(10).join(logger_info)}
+
+**Note:** This report uses only quality-controlled data (QC indicators 1 and 5) for meteorological analysis. Logger information shows which data acquisition systems were active during the storm period."""
 
 
 
@@ -1219,7 +1340,7 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                 print(f"    Found data from {len(storm_data)} station-years")
                 
                 # Create visualizations first (before generating report)
-                overview_plot = self.create_storm_visualizations(storm_name, storm_data, storm_dir)
+                overview_plot = self.create_storm_visualizations(storm_name, storm_data, storm_dir, {'info': storm_info})
                 
                 # Generate report
                 md_content = self.generate_storm_report(

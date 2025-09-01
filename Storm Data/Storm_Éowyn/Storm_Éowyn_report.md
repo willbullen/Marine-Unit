@@ -1,75 +1,50 @@
 # Storm Éowyn - Marine Storm Report
 
-**Report Generated:** 2025-08-25 13:36:54
-
-## Storm Overview
-
-**Dates:** 2025-01-24, 2025-01-25
-
-**Description:** Major winter storm bringing exceptional winds and disruption across Ireland.
-
-**Peak Winds:** 140+ km/h
-
-**Areas Affected:** All areas, Nationwide red warning
+**Report Generated:** 2025-09-01 13:32:52
 
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62091** (M1 Buoy (Retired)): 53.47°N, 5.42°W - West Coast
-- **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W - West Coast
-- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W - South Coast
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W - South Coast
-- **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W - West Coast
+- **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W
+- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W
+- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W
+- **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 25.1 m/s (90.3 km/h) at Buoy 62095
+- **Maximum Wind Speed:** 48.7 knots (90.3 km/h) at Buoy 62095
 - **Maximum Significant Wave Height (Hm0):** 11.5 m at Buoy 62093
-- **Maximum Wave Height (Hmax):** 19.2 m at Buoy 62092
+- **Maximum Wave Height (Hmax):** 18.8 m at Buoy 62092
 - **Minimum Pressure:** 952.0 hPa at Buoy 62095
 - **Temperature Range:** 3.6°C (Buoy 62095) to 13.2°C (Buoy 62092)
-- **Total Observations:** 908 records from 5 stations (QC good data only)
+- **Total Observations:** 550 records from 4 stations (QC good data only)
 
 
 ### Station-by-Station Analysis
 
-### Buoy 62091 - M1 Buoy (Retired)
-- **Location:** 53.47°N, 5.42°W
-- **Region:** West Coast
-- **Peak Wind Speed:** 22.1 m/s (79.5 km/h)
-- **Peak Significant Wave Height (Hm0):** 5.5 m  
-- **Peak Maximum Wave Height (Hmax):** 9.5 m
-- **Minimum Pressure:** 968.3 hPa
-- **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 182 records (QC good data only)
-
-
 ### Buoy 62092 - M2 Buoy
 - **Location:** 53.48°N, 5.42°W
-- **Region:** West Coast
-- **Peak Wind Speed:** 25.0 m/s (90.1 km/h)
+- **Peak Wind Speed:** 48.6 knots (90.1 km/h)
 - **Peak Significant Wave Height (Hm0):** 11.2 m  
-- **Peak Maximum Wave Height (Hmax):** 19.2 m
+- **Peak Maximum Wave Height (Hmax):** 18.8 m
 - **Minimum Pressure:** 962.5 hPa
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 177 records (QC good data only)
+- **Observations:** 92 records (QC good data only)
 
 
 ### Buoy 62093 - M3 Buoy
 - **Location:** 51.22°N, 6.70°W
-- **Region:** South Coast
-- **Peak Wind Speed:** 21.2 m/s (76.1 km/h)
+- **Peak Wind Speed:** 41.1 knots (76.1 km/h)
 - **Peak Significant Wave Height (Hm0):** 11.5 m  
-- **Peak Maximum Wave Height (Hmax):** 18.8 m
+- **Peak Maximum Wave Height (Hmax):** 16.9 m
 - **Minimum Pressure:** 952.7 hPa
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 180 records (QC good data only)
+- **Observations:** 89 records (QC good data only)
 
 
 ### Buoy 62094 - M4 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Region:** South Coast
-- **Peak Wind Speed:** 15.5 m/s (55.9 km/h)
+- **Peak Wind Speed:** 30.2 knots (55.9 km/h)
 - **Peak Significant Wave Height (Hm0):** 9.5 m  
 - **Peak Maximum Wave Height (Hmax):** 17.7 m
 - **Minimum Pressure:** 970.8 hPa
@@ -79,8 +54,7 @@
 
 ### Buoy 62095 - M5 Buoy
 - **Location:** 53.06°N, 7.90°W
-- **Region:** West Coast
-- **Peak Wind Speed:** 25.1 m/s (90.3 km/h)
+- **Peak Wind Speed:** 48.7 knots (90.3 km/h)
 - **Peak Significant Wave Height (Hm0):** 9.6 m  
 - **Peak Maximum Wave Height (Hmax):** 15.8 m
 - **Minimum Pressure:** 952.0 hPa
@@ -92,22 +66,24 @@
 
 ### Wind Analysis
 
-The storm produced maximum sustained winds of **25.1 m/s** (90.3 km/h), representing significant marine weather conditions. Wind speeds of this magnitude pose considerable risks to marine operations and coastal areas.
+The storm produced maximum sustained winds of **48.7 knots** (90.3 km/h).
 
 **Wind Categories:**
-- Force 7 (Strong Gale): 13.9-17.1 m/s (50-61 km/h)
-- Force 8 (Gale): 17.2-20.7 m/s (62-74 km/h)  
-- Force 9 (Strong Gale): 20.8-24.4 m/s (75-88 km/h)
-- Force 10+ (Storm): >24.5 m/s (>88 km/h)
+- Force 7 — Near gale: 28–33 kn (50–61 km/h)
+- Force 8 — Gale: 34–40 kn (62–74 km/h)
+- Force 9 — Severe gale (aka Strong gale): 41–47 kn (75–88 km/h)
+- Force 10 — Storm: 48–55 kn (89–102 km/h)
+- Force 11 — Violent storm: 56–63 kn (103–117 km/h)
+- Force 12 — Hurricane force: ≥64 kn (≥118 km/h)
 
 
 ### Wave Analysis  
 
-**Significant Wave Heights (Hm0):** Peak values reached **11.5 m**, representing **very high** sea states according to the World Meteorological Organization classification.
+**Significant Wave Heights (Hm0):** Peak values reached **11.5 m**, representing **very high**.
 
-**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **19.2 m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
+**Maximum Wave Heights (Hmax):** Individual wave heights peaked at **18.8 m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
-**Wave Height Relationship:** The Hmax/Hm0 ratio was **1.67**, within normal range (1.3-1.8).
+**Wave Height Relationship:** The Hmax/Hm0 ratio was **1.63**, within normal range (1.3-1.8).
 
 **Sea State Classification (Hm0):**
 - Rough: 2.5-4.0 m
@@ -123,38 +99,38 @@ The storm produced maximum sustained winds of **25.1 m/s** (90.3 km/h), represen
 
 ### Pressure Analysis
 
-Atmospheric pressure dropped to a minimum of **952.0 hPa**, representing a pressure anomaly of 61.3 hPa below standard atmospheric pressure (1013.25 hPa).
-
-**Pressure Categories:**
-- Normal: 1013-1023 hPa
-- Low: 1000-1013 hPa
-- Very Low: 980-1000 hPa  
-- Extremely Low: <980 hPa
-
-
-## Storm Timeline
-
-**Storm Period:** 2025-01-23 00:00 to 2025-01-27 00:00 UTC
-
-**Duration:** 4 days, 0 hours
-
-**Key Timeline Points:**
-- Storm approach: Pressure began dropping and winds increased
-- Peak intensity: Maximum winds and waves recorded
-- Storm passage: Gradual improvement in conditions
+Atmospheric pressure dropped to a minimum of **952.0 hPa**.
 
 
 ## Quality Control Summary
 
-**Total Records:** 908
+**Total Records:** 550
 
 **QC Status Distribution:**
-- Good Data (QC=1): 908 records (100.0%)
+- Good Data (QC=1): 550 records (100.0%)
 - Adjusted Data (QC=5): 0 records (0.0%)
-- Failed QC (QC=4): 0 records (0.0%)
 - Missing Data (QC=9): 0 records (0.0%)
 - No QC (QC=0): 0 records (0.0%)
 
+
+
+## Data Sources and Logger Information
+
+### Active Logger Information During Storm Period
+
+**Buoy 62092 (M2 Buoy):**
+- Logger(s) used: 12147_CR6      , 427_Wavesense  
+
+**Buoy 62093 (M3 Buoy):**
+- Logger(s) used: 189_Wavesense  , 12144_CR6      
+
+**Buoy 62094 (M4 Buoy):**
+- Logger(s) used: 8704_CR6       , 347_Wavesense  
+
+**Buoy 62095 (M5 Buoy):**
+- Logger(s) used: 12146_CR6      , 13443_CR6      
+
+**Note:** This report uses only quality-controlled data (QC indicators 1 and 5) for meteorological analysis. Logger information shows which data acquisition systems were active during the storm period.
 
 ## Data Visualization
 

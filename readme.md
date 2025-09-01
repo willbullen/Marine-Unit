@@ -328,7 +328,7 @@ The system processes data from the following buoy stations:
 | Air Pressure | 950-1050 hPa | 10 hPa |
 | Air Temperature | -20 to 40°C | 5°C |
 | Humidity | 0-100% | 20% |
-| Wind Speed | 0-50 m/s | 15 m/s |
+| Wind Speed | 0-50 knots | 15 knots |
 | Wind Direction | 0-360° | 180° |
 | Significant Wave Height (hm0) | 0-15m | 3m |
 | Maximum Wave Height (hmax) | 0-25m | 5m |
@@ -342,7 +342,7 @@ Each station has customized limits based on location and exposure:
 
 **Station 62091** (Exposed Atlantic):
 - Wave Height: 0-18m (spike: 4m) - Higher limits for Atlantic exposure
-- Wind Speed: 0-60 m/s (spike: 20 m/s) - Higher wind limits
+- Wind Speed: 0-60 knots (spike: 20 knots) - Higher wind limits
 - Sea Temperature: 4-18°C (spike: 2°C) - Atlantic temperature range
 
 **Station 62092** (Coastal/Sheltered):
@@ -356,7 +356,7 @@ Each station has customized limits based on location and exposure:
 
 **Station 62094** (Variable Conditions):
 - Wave Height: 0-16m (spike: 3.5m) - Slightly higher wave limits
-- Wind Speed: 0-55 m/s (spike: 18 m/s) - Moderate wind limits
+- Wind Speed: 0-55 knots (spike: 18 knots) - Moderate wind limits
 - Sea Temperature: 4.5-18.5°C (spike: 2.5°C) - Variable temperature range
 
 **Station 62095** (Unique Location):

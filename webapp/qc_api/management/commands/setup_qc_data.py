@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 'humidity': {'display_name': 'Humidity', 'unit': '%', 'type': 'environmental'},
                 'seatemp_16': {'display_name': 'Sea Temperature (16)', 'unit': '°C', 'type': 'water'},
                 'seatemp_aa': {'display_name': 'Sea Temperature (AA)', 'unit': '°C', 'type': 'water'},
-                'windsp': {'display_name': 'Wind Speed', 'unit': 'm/s', 'type': 'environmental'},
+                'windsp': {'display_name': 'Wind Speed', 'unit': 'knots', 'type': 'environmental'},
                 'windgust': {'display_name': 'Wind Gust', 'unit': 'm/s', 'type': 'environmental'},
                 'winddir': {'display_name': 'Wind Direction', 'unit': '°', 'type': 'environmental'},
                 'hm0': {'display_name': 'Significant Wave Height', 'unit': 'm', 'type': 'wave'},

@@ -667,7 +667,7 @@ class BuoyQCProcessor:
         self.plot_parameter_with_qc_colors(axes[0, 1], df, 'airtemp', 'Air Temperature (°C)', 'Temperature (°C)')
         
         # 3. Wind speed
-        self.plot_parameter_with_qc_colors(axes[1, 0], df, 'windsp', 'Wind Speed (m/s)', 'Wind Speed (m/s)')
+        self.plot_parameter_with_qc_colors(axes[1, 0], df, 'windsp', 'Wind Speed (knots)', 'Wind Speed (knots)')
         
         # 4. Significant wave height
         self.plot_parameter_with_qc_colors(axes[1, 1], df, 'hm0', 'Significant Wave Height (m)', 'Wave Height (m)')
