@@ -1,6 +1,6 @@
 # Buoy QC System - Project Status and TODO
 
-**Last Updated:** 2025-08-19
+**Last Updated:** 2025-09-02
 
 ## ✅ COMPLETED TASKS
 
@@ -38,6 +38,12 @@
 - [x] **Simplified naming conventions** - Removed "_by_year" suffixes for cleaner organization
 - [x] **Updated all documentation** - README.md reflects current system capabilities
 - [x] **Fixed cross-platform compatibility** - Unicode encoding and path issues resolved
+
+### 8. Storm Analysis Updates (Recent)
+- [x] **Wind speed units converted to knots** - All storm reports and plots
+- [x] **Active logger data enforced in visuals** - Visualizations use QC-good data from active logger(s)
+- [x] **Logger section simplified in reports** - Shows only logger IDs used during storm period
+- [x] **All storm reports regenerated** - Markdown, PDF, and CSV outputs refreshed
 
 ### 7. Web Application Development
 - [x] **Created Django web application** - Full backend with REST API
@@ -153,7 +159,8 @@
 2. **Schedule sensor maintenance** - Address temperature and conductivity sensor issues
 3. **Execute manual QC workflow** - Apply sensor hierarchy and transfer approved data
 4. **Validate extreme weather events** - Cross-reference high QC failure periods with weather data
-5. **Plan advanced QC implementation** - Prioritize remaining QC tests based on operational needs
+5. **Push latest changes to GitHub** - Ensure documentation and reports are committed
+6. **Plan advanced QC implementation** - Prioritize remaining QC tests based on operational needs
 
 ## 📁 PROJECT FILES STATUS
 

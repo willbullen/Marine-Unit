@@ -217,6 +217,8 @@ The system includes a comprehensive database of named storms from Met Éireann's
 - **Met Éireann Official Styling**: Professional PDF reports matching Storm Centre format
 - **Comprehensive Reports**: Detailed Markdown and PDF reports for each storm
 - **Parameter-Level QC Filtering**: Only uses data with individual QC indicators = 1 (no outliers)
+- **Active Logger-Only Visualizations**: Plots and statistics use QC-good data from the active logger(s) during the storm period
+- **Wind Speed Units in Knots**: All wind speeds displayed in knots (km/h shown where helpful)
 - **Buoy Identification**: Shows which specific buoy recorded each peak condition
 - **Enhanced Wave Analysis**: Includes both Hm0 (significant) and Hmax (maximum) wave heights
 - **Professional Visualizations**: 8-panel meteorological analysis charts
@@ -281,6 +283,11 @@ Each storm report includes:
 - Official storm dates and Met Éireann description
 - Peak wind speeds and affected areas
 - Data sources and station information
+
+#### Data Sources and Logger Information
+- Lists the active logger ID(s) used per buoy during the storm period
+- Uses only QC-approved (indicators 1 and 5 where applicable) data from the active logger(s)
+- Simplified to show logger IDs only (no status/comments)
 
 #### Marine Observations Summary
 - Peak conditions observed with buoy identification
