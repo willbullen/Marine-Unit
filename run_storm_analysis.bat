@@ -18,23 +18,23 @@ REM Change to root directory
 cd /d "%~dp0"
 
 REM Check if virtual environment exists
-if not exist "Storm Scripts\.venv" (
+if not exist "Storms\.venv" (
     echo Creating Python virtual environment...
-    python -m venv "Storm Scripts\.venv"
+    python -m venv "Storms\.venv"
 )
 
 REM Activate virtual environment
-call "Storm Scripts\.venv\Scripts\activate.bat"
+call "Storms\.venv\Scripts\activate.bat"
 
 REM Install/upgrade requirements
 echo Installing required packages...
-pip install -r "Storm Scripts\requirements.txt" --quiet
+pip install -r "Storms\requirements.txt" --quiet
 
 REM Run the storm analysis
 echo.
 echo Starting storm analysis...
 echo.
-python "Storm Scripts\run_storm_analysis.py" %*
+python "Storms\run_storm_analysis.py" %*
 
 REM Keep window open if run without arguments
 if "%1"=="" (

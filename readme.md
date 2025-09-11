@@ -46,16 +46,42 @@ The QC system operates on data stored in the `zzqc_fugrobuoy` database table, wi
 ```
 Buoy QC/
 ├── Buoy Data/                    # Raw data files (15 files: 5 stations × 3 years)
-├── QC Data/                      # Generated QC datasets and reports (60 files)
-├── QC Scripts/                   # Automated QC processing tools
-├── Storm Data/                   # Generated storm reports and data (48 files: 12 storms × 4 files each)
-├── Storm Scripts/                # Marine storm analysis tools
+├── QC/Data/                      # Generated QC/Datasets and reports (60 files)
+├── QC/                   # Automated QC processing tools
+├── Storms/Data/                   # Generated storm reports and data (48 files: 12 storms × 4 files each)
+├── Storms/                # Marine storm analysis tools
 ├── run_qc_windows.bat           # Windows QC runner
 ├── run_qc_ubuntu.sh             # Linux QC runner
 ├── run_storm_analysis.bat       # Windows storm analysis runner
 ├── run_storm_analysis.sh        # Linux storm analysis runner
 └── readme.md                    # This file
 ```
+
+## Consumers (Data Exports)
+
+Build consumer-ready CSVs from QC outputs in `QC/Data/` with these rules:
+- Data from the live logger only (no backup logger data)
+- Filtered values: any parameter failing QC is blanked
+- No indicator columns in outputs
+- One CSV per buoy per year written to `Consumers/Data/`
+
+### Run Consumers
+Windows:
+```batch
+run_consumer.bat
+```
+
+Unix/Linux:
+```bash
+chmod +x run_consumer.sh
+./run_consumer.sh
+```
+
+### Output
+- `Consumers/Data/buoy_STATION_YEAR_consumer.csv`
+  - Example: `buoy_62091_2024_consumer.csv`
+  - Columns exclude all `ind_*`; values with failing indicators are blank
+  - Rows restricted to the live logger period/ID when metadata is available
 
 ## Quality Control System
 
@@ -97,8 +123,8 @@ The system now uses a CSV-based configuration file for all QC limits, making it 
 **Fallback System**: If the CSV file is missing or corrupted, the system automatically falls back to hardcoded limits to ensure continued operation.
 
 **Management Tools**:
-- `QC Scripts/manage_qc_limits.py`: Interactive utility to view/edit limits
-- `QC Scripts/test_qc_limits.py`: Test script to verify CSV loading
+- `QC/manage_qc_limits.py`: Interactive utility to view/edit limits
+- `QC/test_qc_limits.py`: Test script to verify CSV loading
 
 ### Live Logger Filtering
 
@@ -176,10 +202,10 @@ Standard QC applies to the following parameters:
 ### QC Output Generated
 The system generates separate files for each buoy station and year:
 
-- **`QC Data/buoy_STATION_YEAR_qcd.csv`**: QC'd data files (e.g., `buoy_62091_2023_qcd.csv`) - **Only contains data from the live logger**
-- **`QC Data/buoy_STATION_YEAR_qc_report.md`**: Detailed QC analysis reports for each year (markdown) - **Includes live logger information**
-- **`QC Data/buoy_STATION_YEAR_qc_report.pdf`**: Professional PDF reports with embedded visualizations - **Shows which logger was used**
-- **`QC Data/buoy_STATION_YEAR_qc_overview.png`**: Color-coded data visualization plots for each year - **Title includes live logger ID**
+- **`QC/Data/buoy_STATION_YEAR_qcd.csv`**: QC'd data files (e.g., `buoy_62091_2023_qcd.csv`) - **Only contains data from the live logger**
+- **`QC/Data/buoy_STATION_YEAR_qc_report.md`**: Detailed QC analysis reports for each year (markdown) - **Includes live logger information**
+- **`QC/Data/buoy_STATION_YEAR_qc_report.pdf`**: Professional PDF reports with embedded visualizations - **Shows which logger was used**
+- **`QC/Data/buoy_STATION_YEAR_qc_overview.png`**: Color-coded data visualization plots for each year - **Title includes live logger ID**
 
 **Logger Information in Reports**:
 - Which logger was active during the time period
@@ -189,7 +215,7 @@ The system generates separate files for each buoy station and year:
 
 ## Marine Storm Analysis System
 
-### Storm Database
+### Storms/Database
 
 The system includes a comprehensive database of named storms from Met Éireann's Storm Centre:
 
@@ -230,19 +256,19 @@ The system includes a comprehensive database of named storms from Met Éireann's
 
 ```bash
 # Process all storms
-python "Storm Scripts/run_storm_analysis.py"
+python "Storms/run_storm_analysis.py"
 
 # List available storms
-python "Storm Scripts/run_storm_analysis.py" --list
+python "Storms/run_storm_analysis.py" --list
 
 # Process specific storm
-python "Storm Scripts/run_storm_analysis.py" --storm "Storm Agnes"
+python "Storms/run_storm_analysis.py" --storm "Storm Agnes"
 
 # Process storms from specific year
-python "Storm Scripts/run_storm_analysis.py" --year 2023
+python "Storms/run_storm_analysis.py" --year 2023
 
 # Custom directories
-python "Storm Scripts/run_storm_analysis.py" --output "Custom Storm Data" --qc-data "Custom QC Data"
+python "Storms/run_storm_analysis.py" --output "Custom Storms/Data" --qc-data "Custom QC/Data"
 ```
 
 #### Batch File Usage
@@ -266,7 +292,7 @@ run_storm_analysis.bat --year 2024
 Each storm generates 4 files in its dedicated folder:
 
 ```
-Storm Data/
+Storms/Data/
 ├── Storm_Agnes/
 │   ├── Storm_Agnes_report.md      # Detailed markdown report
 │   ├── Storm_Agnes_report.pdf     # Official Met Éireann styled PDF
@@ -514,14 +540,14 @@ with conn:
 - Verify file naming convention: YYYY_XXXXX_zzqc_fugrobuoy.csv
 
 **"Processing failed"**
-- Ensure all dependencies are installed: `pip install -r "QC Scripts/requirements.txt"`
+- Ensure all dependencies are installed: `pip install -r "QC/requirements.txt"`
 - Check Python version is 3.8+
 - Verify data file format and structure
 
 ### Common Storm Analysis Issues
 
-**"No QC data available"**
-- Check that QC Data directory contains *_qcd.csv files
+**"No QC/Data available"**
+- Check that QC/Data directory contains *_qcd.csv files
 - Verify file naming convention: buoy_XXXXX_YYYY_qcd.csv
 
 **"Storm not found in database"**
@@ -537,16 +563,16 @@ with conn:
 ### General Issues
 
 **Missing Dependencies**
-- Run: `pip install -r "QC Scripts/requirements.txt"`
-- Run: `pip install -r "Storm Scripts/requirements.txt"`
+- Run: `pip install -r "QC/requirements.txt"`
+- Run: `pip install -r "Storms/requirements.txt"`
 - Ensure Python 3.8+ is installed
 - Check virtual environment activation
 
 ## Important Notes
 
 - All processing preserves original data in `Buoy Data/` folder
-- QC'd output goes to `QC Data/` folder
-- Storm reports go to `Storm Data/` folder
+- QC'd output goes to `QC/Data/` folder
+- Storm reports go to `Storms/Data/` folder
 - Scripts are designed to be run multiple times safely
 - Virtual environment is created automatically if it doesn't exist
 - Storm analysis uses only parameter-level QC good data (no outliers)

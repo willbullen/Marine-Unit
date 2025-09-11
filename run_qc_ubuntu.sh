@@ -47,7 +47,7 @@ python -m pip install --upgrade pip
 
 # Install/update dependencies
 echo "Installing required packages..."
-pip install -r "QC Scripts/requirements.txt"
+pip install -r "QC/requirements.txt"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install dependencies"
     exit 1
@@ -63,7 +63,7 @@ rm -f "QC Data"/buoy_*_2025_*.*
 echo ""
 echo "Running QC processing..."
 echo "========================"
-cd "QC Scripts"
+cd "QC"
 python buoy_qc_processor.py
 if [ $? -ne 0 ]; then
     echo "ERROR: QC processing failed"

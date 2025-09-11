@@ -32,7 +32,7 @@ if errorlevel 1 (
 
 REM Install/update dependencies
 echo Installing required packages...
-pip install -r "QC Scripts\requirements.txt"
+pip install -r "QC\requirements.txt"
 if errorlevel 1 (
     echo ERROR: Failed to install dependencies
     pause
@@ -49,7 +49,7 @@ REM Run QC processing
 echo.
 echo Running QC processing...
 echo ========================
-cd "QC Scripts"
+cd "QC"
 python buoy_qc_processor.py
 if errorlevel 1 (
     echo ERROR: QC processing failed

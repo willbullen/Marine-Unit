@@ -167,12 +167,14 @@
 ### Scripts and Automation
 - ✅ `run_qc_windows.bat` - Windows execution script
 - ✅ `run_qc_ubuntu.sh` - Ubuntu execution script  
+- ✅ `run_consumer.bat` - Windows consumer export script
+- ✅ `run_consumer.sh` - Linux consumer export script
 - ✅ `QC Scripts/buoy_qc_processor.py` - Main QC processing engine
 - ✅ `QC Scripts/verify_qc_output.py` - Output verification
 - ✅ `QC Scripts/requirements.txt` - Python dependencies
 
 ### Documentation
-- ✅ `readme.md` - Comprehensive system documentation
+- ✅ `readme.md` - Comprehensive system documentation (includes Consumers section)
 - ✅ `todo.md` - This project status file
 - ✅ `webapp/README_webapp.md` - Web application documentation
 
