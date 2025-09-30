@@ -1,0 +1,186 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                   Third-Party Data Confirmation Workflow                       ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: Setup Data Sources                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    $ python manage.py setup_third_party_sources
+    
+    ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+    │   NOAA NDBC      │     │  Copernicus      │     │  UK Met Office   │
+    │   Source ID: 1   │     │  Source ID: 2    │     │  Source ID: 3    │
+    └──────────────────┘     └──────────────────┘     └──────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: Import Third-Party Data                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    POST /api/import-third-party/
+    {
+      "station_id": "62091",
+      "source_id": 1,
+      "data": [
+        {
+          "timestamp": "2024-01-01T12:00:00Z",
+          "air_temp": 15.5,
+          "wind_speed": 8.3,
+          "wave_height": 2.1
+        },
+        ...
+      ]
+    }
+    
+    ↓
+    
+    ┌──────────────────────────────────────────────────────────────────┐
+    │ ThirdPartyData Table                                              │
+    ├──────────────┬────────────┬─────────────┬───────────┬────────────┤
+    │ Station      │ Source     │ Timestamp   │ Air Temp  │ Wave Ht    │
+    ├──────────────┼────────────┼─────────────┼───────────┼────────────┤
+    │ 62091        │ NOAA NDBC  │ 2024-01-01  │ 15.5°C    │ 2.1m       │
+    │ 62091        │ NOAA NDBC  │ 2024-01-01  │ 15.8°C    │ 2.3m       │
+    │ 62091        │ NOAA NDBC  │ 2024-01-02  │ 16.0°C    │ 2.5m       │
+    └──────────────┴────────────┴─────────────┴───────────┴────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: Run Data Confirmation                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    POST /api/run-confirmation/
+    {
+      "station_id": "62091",
+      "start_date": "2024-01-01T00:00:00Z",
+      "end_date": "2024-01-07T23:59:59Z",
+      "parameters": ["airtemp", "windsp", "hm0"],
+      "tolerance_percent": 10.0
+    }
+    
+    ↓
+    
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │ Comparison Logic                                                      │
+    └──────────────────────────────────────────────────────────────────────┘
+    
+    For each timestamp and parameter:
+    
+    1. Load Station Value     →  15.5°C  (from QC'd data)
+    2. Load Third-Party Value →  15.8°C  (from imported data)
+    3. Calculate Difference   →  0.3°C
+    4. Calculate % Difference →  1.9%
+    5. Compare to Tolerance   →  1.9% < 10% ✓
+    6. Status                 →  CONFIRMED
+    
+    ↓
+    
+    ┌──────────────────────────────────────────────────────────────────────┐
+    │ DataConfirmation Table                                                │
+    ├──────────┬───────────┬────────────┬──────────┬──────────┬───────────┤
+    │ Station  │ Parameter │ Station Val│ 3rd Party│ Diff %   │ Status    │
+    ├──────────┼───────────┼────────────┼──────────┼──────────┼───────────┤
+    │ 62091    │ airtemp   │ 15.5°C     │ 15.8°C   │ 1.9%     │ Confirmed │
+    │ 62091    │ windsp    │ 8.3 m/s    │ 8.0 m/s  │ 3.6%     │ Confirmed │
+    │ 62091    │ hm0       │ 2.1 m      │ 2.3 m    │ 9.5%     │ Confirmed │
+    │ 62091    │ airtemp   │ 18.0°C     │ 15.0°C   │ 16.7%    │Discrepancy│
+    └──────────┴───────────┴────────────┴──────────┴──────────┴───────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: View Confirmation Summary                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    GET /api/stations/62091/confirmation-summary/
+    
+    Response:
+    {
+      "station_id": "62091",
+      "station_name": "M2 Buoy",
+      "total_confirmations": 168,
+      "status_breakdown": {
+        "confirmed": {
+          "count": 150,
+          "percentage": 89.3,
+          "label": "Confirmed - Data matches within tolerance"
+        },
+        "discrepancy": {
+          "count": 18,
+          "percentage": 10.7,
+          "label": "Discrepancy - Significant difference detected"
+        }
+      },
+      "parameter_summary": [
+        {
+          "parameter": "airtemp",
+          "display_name": "Air Temperature",
+          "total": 56,
+          "confirmed": 52,
+          "discrepancies": 4,
+          "confirmation_rate": 92.9
+        },
+        ...
+      ]
+    }
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ CONFIRMATION STATUS MEANINGS                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ✓ CONFIRMED     - Station data matches third-party data within tolerance
+    ✗ DISCREPANCY   - Significant difference detected (exceeds tolerance)
+    ○ MISSING       - No third-party data available for comparison
+    ⧗ PENDING       - Awaiting confirmation processing
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ USE CASES                                                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    1. Quality Assurance
+       → Validate station data against trusted external sources
+       → Identify sensor calibration issues
+       → Detect systematic errors
+
+    2. Data Verification
+       → Confirm extreme values are real phenomena
+       → Cross-validate after sensor maintenance
+       → Support audit requirements
+
+    3. Gap Filling
+       → Identify periods where station data is questionable
+       → Provide alternative data source references
+       → Support data recovery efforts
+
+    4. Performance Monitoring
+       → Track confirmation rates over time
+       → Identify declining sensor performance
+       → Schedule maintenance proactively
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PARAMETER MAPPING                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    Station Parameter  →  Third-Party Field
+    ─────────────────────────────────────────
+    airpressure        →  air_pressure
+    airtemp            →  air_temp
+    humidity           →  humidity
+    windsp             →  wind_speed
+    winddir            →  wind_direction
+    hm0                →  wave_height
+    hmax               →  wave_height_max
+    tp                 →  wave_period
+    mdir               →  wave_direction
+    seatemp_aa         →  sea_temp
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ KEY BENEFITS                                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    ✓ Automated validation against multiple trusted sources
+    ✓ Configurable tolerance thresholds per parameter
+    ✓ Detailed tracking of every comparison
+    ✓ Easy identification of sensor issues
+    ✓ Support for regulatory compliance
+    ✓ RESTful API for integration
+    ✓ Admin interface for manual review
+    ✓ Comprehensive reporting capabilities
+
