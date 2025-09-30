@@ -8,9 +8,10 @@ This Django web application provides a modern interface for managing buoy qualit
 
 ### Backend (Django)
 - **Django REST Framework**: API endpoints for QC operations
-- **Models**: BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult
+- **Models**: BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult, ThirdPartyBuoyData, QCConfirmation
 - **Integration**: Connects to existing QC processing scripts
 - **Database**: SQLite for development (easily configurable for production)
+- **Third-Party Data**: Import and validate QC results with external data sources
 
 ### Frontend (React + shadcn/ui)
 - **React TypeScript**: Modern frontend framework
@@ -27,6 +28,9 @@ This Django web application provides a modern interface for managing buoy qualit
 - **QC Limits Configuration**: Station-specific QC threshold management
 - **Data Integration**: Automatic import of existing QC processor configuration
 - **File Downloads**: API endpoints for downloading QC reports and data
+- **Third-Party Data Import**: Import external buoy data (ERA5, Met Éireann, NOAA)
+- **QC Confirmation**: Validate QC results with third-party data comparisons
+- **Statistical Analysis**: Calculate MAE, RMSE, correlation for validation
 
 ### 🚧 In Development
 - **React Dashboard**: Modern UI for QC monitoring
@@ -102,6 +106,51 @@ python manage.py runserver
 ### QC Processing
 - `POST /api/run-qc/` - Trigger QC processing job
 
+### Third-Party Data
+- `GET /api/third-party-data/` - List all third-party data records
+- `GET /api/third-party-data/?station_id={id}` - Filter by station
+- `GET /api/third-party-data/?year={year}` - Filter by year
+- `GET /api/third-party-data/?source={source}` - Filter by source (era5, met_eireann, noaa)
+- `POST /api/third-party-data/` - Create third-party data record
+
+### QC Confirmation
+- `GET /api/confirmations/` - List all QC confirmation results
+- `GET /api/confirmations/?station_id={id}` - Filter by station
+- `GET /api/confirmations/?year={year}` - Filter by year
+- Returns confirmation rates, MAE, RMSE, and correlation statistics
+
+## Management Commands
+
+### Import Third-Party Data
+```bash
+# Import ERA5 data
+python manage.py import_third_party_data --source era5 --file path/to/data.csv
+
+# Import Met Éireann data
+python manage.py import_third_party_data --source met_eireann --file path/to/data.csv
+
+# Clear existing data before import
+python manage.py import_third_party_data --source era5 --file path/to/data.csv --clear
+```
+
+### Confirm QC Data
+```bash
+# Confirm specific station and year
+python manage.py confirm_qc_data --station 62091 --year 2023
+
+# Confirm all stations and years
+python manage.py confirm_qc_data --all
+
+# Use specific third-party source
+python manage.py confirm_qc_data --station 62091 --year 2023 --source era5
+```
+
+### Setup QC Data
+```bash
+# Initialize QC parameters and station limits
+python manage.py setup_qc_data
+```
+
 ## Database Models
 
 ### BuoyStation
@@ -123,6 +172,19 @@ python manage.py runserver
 ### QCResult
 - Stores QC processing results
 - Links to generated files and statistics
+
+### ThirdPartyBuoyData
+- Stores third-party data from external sources
+- Supports ERA5, Met Éireann, NOAA, Copernicus, and other sources
+- Includes atmospheric, wind, wave, and water parameters
+- Quality flags and metadata tracking
+
+### QCConfirmation
+- Stores QC confirmation analysis results
+- Compares QC'd data with third-party sources
+- Calculates statistical metrics (MAE, RMSE, correlation)
+- Parameter-specific confirmation rates
+- Links to QC results for traceability
 
 ## Configuration
 
