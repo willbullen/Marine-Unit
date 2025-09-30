@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult
+from .models import (
+    BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult,
+    ThirdPartyBuoyData, QCConfirmation
+)
 
 class QCParameterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -67,3 +70,24 @@ class QCProcessingRequestSerializer(serializers.Serializer):
         required=False,
         help_text="List of years to process. If empty, all available years will be processed."
     )
+
+class ThirdPartyBuoyDataSerializer(serializers.ModelSerializer):
+    station_id = serializers.CharField(source='station.station_id', read_only=True)
+    
+    class Meta:
+        model = ThirdPartyBuoyData
+        fields = '__all__'
+
+class QCConfirmationSerializer(serializers.ModelSerializer):
+    station_id = serializers.CharField(source='station.station_id', read_only=True)
+    station_name = serializers.CharField(source='station.name', read_only=True)
+    
+    class Meta:
+        model = QCConfirmation
+        fields = ['station_id', 'station_name', 'year', 'total_comparisons',
+                 'confirmed_records', 'deviation_records', 'confirmation_rate',
+                 'air_pressure_confirmation', 'air_temp_confirmation',
+                 'wind_speed_confirmation', 'wave_height_confirmation',
+                 'sea_temp_confirmation', 'mean_absolute_error',
+                 'root_mean_square_error', 'correlation_coefficient',
+                 'third_party_source', 'analysis_date', 'notes']

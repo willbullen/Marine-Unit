@@ -578,6 +578,47 @@ with conn:
 - Storm analysis uses only parameter-level QC good data (no outliers)
 - PDF reports follow official Met Éireann styling and branding
 
+## Third Party Data Confirmation
+
+The system now supports ingesting and using third-party buoy data to confirm and validate QC'd measurements:
+
+### Features
+- **Multiple Data Sources**: Support for ERA5, Met Éireann, NOAA, Copernicus, and other sources
+- **Automated Comparison**: Compare QC'd data with third-party measurements
+- **Statistical Metrics**: Calculate MAE, RMSE, and correlation coefficients
+- **Confirmation Rates**: Parameter-specific confirmation statistics
+- **API Access**: Query confirmation results via REST API
+
+### Quick Start
+
+1. **Import Third-Party Data**:
+   ```bash
+   cd webapp
+   python manage.py import_third_party_data --source era5 --file "../Third Party Data/sample_third_party_data.csv"
+   ```
+
+2. **Run QC Confirmation**:
+   ```bash
+   python manage.py confirm_qc_data --station 62091 --year 2023
+   ```
+
+3. **View Results**:
+   ```bash
+   # Via API
+   curl http://localhost:8000/api/confirmations/?station_id=62091
+   ```
+
+### Data Format
+
+Third-party data should be provided in CSV format with columns:
+- `station_id`, `timestamp` (required)
+- Weather parameters: `air_pressure`, `air_temperature`, `humidity`
+- Wind parameters: `wind_speed`, `wind_direction`, `wind_gust`
+- Wave parameters: `significant_wave_height`, `max_wave_height`, `wave_period`, `wave_direction`
+- Water parameters: `sea_temperature`, `salinity`
+
+See `Third Party Data/README.md` for complete documentation and examples.
+
 ## Future Enhancements
 
 ### Reanalysis Data Integration
@@ -586,6 +627,7 @@ Integration with ERA5 reanalysis data for enhanced QC validation:
 - **Data Source**: [Copernicus ERA5 Reanalysis](https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels?tab=overview)
 - **API Access**: [Copernicus API Documentation](https://cds.climate.copernicus.eu/how-to-api)
 - **Purpose**: Provide modeled data comparison for automated QC validation
+- **Status**: ✅ Framework implemented - ready for ERA5 data import
 
 ---
 
