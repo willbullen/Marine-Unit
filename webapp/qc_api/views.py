@@ -14,11 +14,16 @@ import json
 # Add the parent directory to Python path to import QC processor
 sys.path.append(str(settings.BASE_DIR.parent / 'QC Scripts'))
 
-from .models import BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult
+from .models import (
+    BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult,
+    ThirdPartyDataSource, ThirdPartyData, DataConfirmation
+)
 from .serializers import (
     BuoyStationSerializer, QCParameterSerializer, StationQCLimitSerializer,
     QCProcessingJobSerializer, QCResultSerializer, QCLimitUpdateSerializer,
-    QCProcessingRequestSerializer
+    QCProcessingRequestSerializer, ThirdPartyDataSourceSerializer,
+    ThirdPartyDataSerializer, DataConfirmationSerializer,
+    ThirdPartyDataImportSerializer, DataConfirmationRequestSerializer
 )
 
 class BuoyStationViewSet(viewsets.ModelViewSet):
@@ -259,6 +264,287 @@ def get_station_qc_limits(request, station_id):
             'station_name': station.name,
             'exposure_type': station.exposure_type,
             'limits': limits_data
+        })
+        
+    except BuoyStation.DoesNotExist:
+        return Response({'error': 'Station not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Third-Party Data Management Views
+
+class ThirdPartyDataSourceViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing third-party data sources"""
+    queryset = ThirdPartyDataSource.objects.all()
+    serializer_class = ThirdPartyDataSourceSerializer
+
+class ThirdPartyDataViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing third-party data"""
+    queryset = ThirdPartyData.objects.all()
+    serializer_class = ThirdPartyDataSerializer
+    
+    def get_queryset(self):
+        queryset = ThirdPartyData.objects.all()
+        station_id = self.request.query_params.get('station_id')
+        source_id = self.request.query_params.get('source_id')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        if station_id:
+            queryset = queryset.filter(station__station_id=station_id)
+        if source_id:
+            queryset = queryset.filter(source_id=source_id)
+        if start_date:
+            queryset = queryset.filter(timestamp__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(timestamp__lte=end_date)
+        
+        return queryset
+
+class DataConfirmationViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for viewing data confirmations"""
+    queryset = DataConfirmation.objects.all()
+    serializer_class = DataConfirmationSerializer
+    
+    def get_queryset(self):
+        queryset = DataConfirmation.objects.all()
+        station_id = self.request.query_params.get('station_id')
+        status_filter = self.request.query_params.get('status')
+        start_date = self.request.query_params.get('start_date')
+        end_date = self.request.query_params.get('end_date')
+        
+        if station_id:
+            queryset = queryset.filter(station__station_id=station_id)
+        if status_filter:
+            queryset = queryset.filter(confirmation_status=status_filter)
+        if start_date:
+            queryset = queryset.filter(timestamp__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(timestamp__lte=end_date)
+        
+        return queryset
+
+@api_view(['POST'])
+def import_third_party_data(request):
+    """Import third-party data for a station"""
+    serializer = ThirdPartyDataImportSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        try:
+            station_id = serializer.validated_data['station_id']
+            source_id = serializer.validated_data['source_id']
+            data_records = serializer.validated_data['data']
+            
+            station = BuoyStation.objects.get(station_id=station_id)
+            source = ThirdPartyDataSource.objects.get(id=source_id)
+            
+            imported_count = 0
+            updated_count = 0
+            errors = []
+            
+            for record in data_records:
+                try:
+                    # Parse timestamp
+                    from datetime import datetime
+                    timestamp = record.get('timestamp')
+                    if isinstance(timestamp, str):
+                        timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                    
+                    # Create or update third-party data record
+                    third_party_data, created = ThirdPartyData.objects.update_or_create(
+                        station=station,
+                        source=source,
+                        timestamp=timestamp,
+                        defaults={
+                            'air_pressure': record.get('air_pressure'),
+                            'air_temp': record.get('air_temp'),
+                            'humidity': record.get('humidity'),
+                            'wind_speed': record.get('wind_speed'),
+                            'wind_direction': record.get('wind_direction'),
+                            'wave_height': record.get('wave_height'),
+                            'wave_height_max': record.get('wave_height_max'),
+                            'wave_period': record.get('wave_period'),
+                            'wave_direction': record.get('wave_direction'),
+                            'sea_temp': record.get('sea_temp'),
+                            'data_quality': record.get('data_quality', ''),
+                            'raw_data': record
+                        }
+                    )
+                    
+                    if created:
+                        imported_count += 1
+                    else:
+                        updated_count += 1
+                        
+                except Exception as e:
+                    errors.append(f"Error importing record {record.get('timestamp')}: {str(e)}")
+            
+            return Response({
+                'message': 'Third-party data import completed',
+                'imported': imported_count,
+                'updated': updated_count,
+                'errors': errors
+            })
+            
+        except BuoyStation.DoesNotExist:
+            return Response({'error': 'Station not found'}, status=status.HTTP_404_NOT_FOUND)
+        except ThirdPartyDataSource.DoesNotExist:
+            return Response({'error': 'Data source not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def run_data_confirmation(request):
+    """Run data confirmation comparing station data with third-party data"""
+    serializer = DataConfirmationRequestSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        try:
+            import pandas as pd
+            from datetime import datetime
+            
+            station_id = serializer.validated_data['station_id']
+            start_date = serializer.validated_data['start_date']
+            end_date = serializer.validated_data['end_date']
+            parameters = serializer.validated_data.get('parameters', [])
+            tolerance_percent = serializer.validated_data.get('tolerance_percent', 10.0)
+            
+            station = BuoyStation.objects.get(station_id=station_id)
+            
+            # Parameter mapping between station data and third-party data
+            param_mapping = {
+                'airpressure': 'air_pressure',
+                'airtemp': 'air_temp',
+                'humidity': 'humidity',
+                'windsp': 'wind_speed',
+                'winddir': 'wind_direction',
+                'hm0': 'wave_height',
+                'hmax': 'wave_height_max',
+                'tp': 'wave_period',
+                'mdir': 'wave_direction',
+                'seatemp_aa': 'sea_temp'
+            }
+            
+            # Get third-party data for the time period
+            third_party_data = ThirdPartyData.objects.filter(
+                station=station,
+                timestamp__gte=start_date,
+                timestamp__lte=end_date
+            ).order_by('timestamp', 'source')
+            
+            if not third_party_data.exists():
+                return Response({
+                    'message': 'No third-party data available for the specified period',
+                    'confirmations_created': 0
+                })
+            
+            # Load station QC data (this would need to be from actual QC'd CSV files)
+            # For now, we'll create a placeholder implementation
+            confirmations_created = 0
+            
+            # Get or create QC parameters
+            if not parameters:
+                parameters = list(param_mapping.keys())
+            
+            for param_name in parameters:
+                try:
+                    param = QCParameter.objects.get(name=param_name)
+                    third_party_field = param_mapping.get(param_name)
+                    
+                    if not third_party_field:
+                        continue
+                    
+                    # Process each third-party data point
+                    for tp_data in third_party_data:
+                        tp_value = getattr(tp_data, third_party_field)
+                        
+                        if tp_value is None:
+                            continue
+                        
+                        # Create confirmation record
+                        # Note: station_value and station_qc_status would need to be loaded from QC'd data
+                        # This is a simplified implementation
+                        confirmation, created = DataConfirmation.objects.update_or_create(
+                            station=station,
+                            timestamp=tp_data.timestamp,
+                            parameter=param,
+                            defaults={
+                                'third_party_source': tp_data.source,
+                                'third_party_value': tp_value,
+                                'tolerance_threshold': tolerance_percent,
+                                'confirmation_status': 'pending'
+                            }
+                        )
+                        
+                        if created:
+                            confirmations_created += 1
+                            
+                except QCParameter.DoesNotExist:
+                    continue
+            
+            return Response({
+                'message': 'Data confirmation completed',
+                'station_id': station_id,
+                'period': f"{start_date} to {end_date}",
+                'confirmations_created': confirmations_created,
+                'third_party_records': third_party_data.count()
+            })
+            
+        except BuoyStation.DoesNotExist:
+            return Response({'error': 'Station not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def confirmation_summary(request, station_id):
+    """Get confirmation summary for a station"""
+    try:
+        station = BuoyStation.objects.get(station_id=station_id)
+        
+        confirmations = DataConfirmation.objects.filter(station=station)
+        
+        # Calculate summary statistics
+        total_confirmations = confirmations.count()
+        status_breakdown = {}
+        for status_choice in DataConfirmation.CONFIRMATION_STATUS:
+            status_code = status_choice[0]
+            count = confirmations.filter(confirmation_status=status_code).count()
+            if count > 0:
+                status_breakdown[status_code] = {
+                    'count': count,
+                    'percentage': (count / total_confirmations * 100) if total_confirmations > 0 else 0,
+                    'label': status_choice[1]
+                }
+        
+        # Get parameter-wise breakdown
+        parameter_summary = []
+        parameters = QCParameter.objects.filter(is_active=True)
+        
+        for param in parameters:
+            param_confirmations = confirmations.filter(parameter=param)
+            if param_confirmations.count() > 0:
+                confirmed_count = param_confirmations.filter(confirmation_status='confirmed').count()
+                discrepancy_count = param_confirmations.filter(confirmation_status='discrepancy').count()
+                
+                parameter_summary.append({
+                    'parameter': param.name,
+                    'display_name': param.display_name,
+                    'total': param_confirmations.count(),
+                    'confirmed': confirmed_count,
+                    'discrepancies': discrepancy_count,
+                    'confirmation_rate': (confirmed_count / param_confirmations.count() * 100) if param_confirmations.count() > 0 else 0
+                })
+        
+        return Response({
+            'station_id': station_id,
+            'station_name': station.name,
+            'total_confirmations': total_confirmations,
+            'status_breakdown': status_breakdown,
+            'parameter_summary': parameter_summary
         })
         
     except BuoyStation.DoesNotExist:

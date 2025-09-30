@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult
+from .models import (
+    BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult,
+    ThirdPartyDataSource, ThirdPartyData, DataConfirmation
+)
 
 class QCParameterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,4 +69,71 @@ class QCProcessingRequestSerializer(serializers.Serializer):
         child=serializers.IntegerField(min_value=2020, max_value=2030),
         required=False,
         help_text="List of years to process. If empty, all available years will be processed."
+    )
+
+class ThirdPartyDataSourceSerializer(serializers.ModelSerializer):
+    """Serializer for third-party data sources"""
+    source_type_display = serializers.CharField(source='get_source_type_display', read_only=True)
+    
+    class Meta:
+        model = ThirdPartyDataSource
+        fields = ['id', 'name', 'source_type', 'source_type_display', 'description', 
+                 'api_endpoint', 'update_frequency', 'is_active', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
+
+class ThirdPartyDataSerializer(serializers.ModelSerializer):
+    """Serializer for third-party buoy data"""
+    station_id = serializers.CharField(source='station.station_id', read_only=True)
+    station_name = serializers.CharField(source='station.name', read_only=True)
+    source_name = serializers.CharField(source='source.name', read_only=True)
+    
+    class Meta:
+        model = ThirdPartyData
+        fields = ['id', 'station_id', 'station_name', 'source', 'source_name', 'timestamp',
+                 'air_pressure', 'air_temp', 'humidity', 'wind_speed', 'wind_direction',
+                 'wave_height', 'wave_height_max', 'wave_period', 'wave_direction',
+                 'sea_temp', 'data_quality', 'raw_data', 'imported_at']
+        read_only_fields = ['imported_at']
+
+class DataConfirmationSerializer(serializers.ModelSerializer):
+    """Serializer for data confirmations"""
+    station_id = serializers.CharField(source='station.station_id', read_only=True)
+    station_name = serializers.CharField(source='station.name', read_only=True)
+    parameter_name = serializers.CharField(source='parameter.name', read_only=True)
+    parameter_display_name = serializers.CharField(source='parameter.display_name', read_only=True)
+    source_name = serializers.CharField(source='third_party_source.name', read_only=True)
+    confirmation_status_display = serializers.CharField(source='get_confirmation_status_display', read_only=True)
+    
+    class Meta:
+        model = DataConfirmation
+        fields = ['id', 'station_id', 'station_name', 'timestamp', 'parameter', 
+                 'parameter_name', 'parameter_display_name', 'station_value', 
+                 'station_qc_status', 'third_party_source', 'source_name',
+                 'third_party_value', 'difference', 'percent_difference',
+                 'confirmation_status', 'confirmation_status_display', 'tolerance_threshold',
+                 'notes', 'confirmed_at']
+        read_only_fields = ['confirmed_at']
+
+class ThirdPartyDataImportSerializer(serializers.Serializer):
+    """Serializer for importing third-party data"""
+    station_id = serializers.CharField(max_length=10)
+    source_id = serializers.IntegerField()
+    data = serializers.ListField(
+        child=serializers.DictField(),
+        help_text="List of data records to import. Each record should contain timestamp and parameter values."
+    )
+    
+class DataConfirmationRequestSerializer(serializers.Serializer):
+    """Serializer for requesting data confirmation"""
+    station_id = serializers.CharField(max_length=10)
+    start_date = serializers.DateTimeField()
+    end_date = serializers.DateTimeField()
+    parameters = serializers.ListField(
+        child=serializers.CharField(max_length=50),
+        required=False,
+        help_text="List of parameter names to confirm. If empty, all available parameters will be confirmed."
+    )
+    tolerance_percent = serializers.FloatField(
+        default=10.0,
+        help_text="Tolerance percentage for confirmation (default: 10%)"
     )
