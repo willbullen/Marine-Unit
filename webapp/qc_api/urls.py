@@ -7,6 +7,8 @@ router.register(r'stations', views.BuoyStationViewSet)
 router.register(r'parameters', views.QCParameterViewSet)
 router.register(r'limits', views.StationQCLimitViewSet)
 router.register(r'results', views.QCResultViewSet)
+router.register(r'third-party-data', views.ThirdPartyBuoyDataViewSet)
+router.register(r'confirmations', views.QCConfirmationViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

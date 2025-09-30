@@ -14,11 +14,14 @@ import json
 # Add the parent directory to Python path to import QC processor
 sys.path.append(str(settings.BASE_DIR.parent / 'QC Scripts'))
 
-from .models import BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult
+from .models import (
+    BuoyStation, QCParameter, StationQCLimit, QCProcessingJob, QCResult,
+    ThirdPartyBuoyData, QCConfirmation
+)
 from .serializers import (
     BuoyStationSerializer, QCParameterSerializer, StationQCLimitSerializer,
     QCProcessingJobSerializer, QCResultSerializer, QCLimitUpdateSerializer,
-    QCProcessingRequestSerializer
+    QCProcessingRequestSerializer, ThirdPartyBuoyDataSerializer, QCConfirmationSerializer
 )
 
 class BuoyStationViewSet(viewsets.ModelViewSet):
@@ -265,3 +268,39 @@ def get_station_qc_limits(request, station_id):
         return Response({'error': 'Station not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class ThirdPartyBuoyDataViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing third-party buoy data"""
+    queryset = ThirdPartyBuoyData.objects.all()
+    serializer_class = ThirdPartyBuoyDataSerializer
+    
+    def get_queryset(self):
+        queryset = ThirdPartyBuoyData.objects.all()
+        station_id = self.request.query_params.get('station_id')
+        year = self.request.query_params.get('year')
+        source = self.request.query_params.get('source')
+        
+        if station_id:
+            queryset = queryset.filter(station__station_id=station_id)
+        if year:
+            queryset = queryset.filter(timestamp__year=year)
+        if source:
+            queryset = queryset.filter(source=source)
+        
+        return queryset.order_by('-timestamp')
+
+class QCConfirmationViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for viewing QC confirmation results"""
+    queryset = QCConfirmation.objects.all()
+    serializer_class = QCConfirmationSerializer
+    
+    def get_queryset(self):
+        queryset = QCConfirmation.objects.all()
+        station_id = self.request.query_params.get('station_id')
+        year = self.request.query_params.get('year')
+        
+        if station_id:
+            queryset = queryset.filter(station__station_id=station_id)
+        if year:
+            queryset = queryset.filter(year=year)
+        
+        return queryset.order_by('-year')
