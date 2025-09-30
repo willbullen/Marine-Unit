@@ -416,14 +416,44 @@ WHERE loggerid LIKE '%Wave%'
 
 **Important**: Only one logger per buoy should have `ind_parameter = 1` for each parameter.
 
-### 2. Individual Value Corrections
+### 2. Third-Party Data Confirmation
+
+The system supports ingesting and comparing data from third-party sources (NOAA NDBC, Copernicus Marine Service, UK Met Office) to validate station QC'd data.
+
+**Features:**
+- Import external buoy data from multiple sources
+- Automated comparison with station data
+- Configurable tolerance thresholds
+- Discrepancy detection and reporting
+- API-based data import and confirmation
+
+**Quick Start:**
+```bash
+# Setup third-party data sources
+cd webapp
+python manage.py setup_third_party_sources
+
+# Run demo to see third-party confirmation in action
+python demo_third_party_confirmation.py
+```
+
+**API Endpoints:**
+- `POST /api/import-third-party/` - Import third-party data
+- `POST /api/run-confirmation/` - Run data confirmation
+- `GET /api/stations/{station_id}/confirmation-summary/` - View confirmation summary
+- `GET /api/third-party-sources/` - Manage data sources
+- `GET /api/confirmations/` - View confirmation results
+
+See [webapp/THIRD_PARTY_DATA.md](webapp/THIRD_PARTY_DATA.md) for detailed documentation.
+
+### 3. Individual Value Corrections
 For problematic values, update both the parameter value and its indicator while preserving raw data (`parameter_1`, `parameter_2`):
 
 - Update `parameter` (corrected value)
 - Update `ind_parameter` (set to `4` or `5`)
 - **Do not modify** `parameter_1` or `parameter_2` (preserve raw data)
 
-### 3. Record-Level QC Completion
+### 4. Record-Level QC Completion
 After all parameters are QC'd, mark the entire record as complete:
 
 ```sql
