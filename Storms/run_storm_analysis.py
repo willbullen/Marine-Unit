@@ -96,7 +96,7 @@ def process_specific_storm(analyzer, storm_name):
     overview_plot = analyzer.create_storm_visualizations(storm_name, storm_data, storm_dir)
     
     # Generate report
-    md_content = analyzer.generate_storm_report(
+    md_content, stats = analyzer.generate_storm_report(
         storm_name, 
         {'info': found_storm}, 
         storm_data, 
@@ -110,12 +110,12 @@ def process_specific_storm(analyzer, storm_name):
         f.write(md_content)
     
     pdf_path = storm_dir / f"{storm_name.replace(' ', '_')}_report.pdf"
-    analyzer.convert_md_to_pdf(md_content, pdf_path, storm_name)
+    analyzer.convert_md_to_pdf(md_content, pdf_path, storm_name, stats)
     
     csv_path = storm_dir / f"{storm_name.replace(' ', '_')}_data.csv"
     analyzer.save_storm_data_csv(storm_data, csv_path)
     
-    print(f"✓ {storm_name} processing complete")
+    print(f"[OK] {storm_name} processing complete")
     print(f"Files saved to: {storm_dir}")
     
     return True

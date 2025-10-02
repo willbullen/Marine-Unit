@@ -1,65 +1,77 @@
 # Storm Babet - Marine Storm Report
 
-**Report Generated:** 2025-09-01 13:32:15
+**Report Generated:** 2025-10-02 14:38:37
 
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62091** (M1 Buoy (Retired)): 53.47°N, 5.42°W
-- **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W
-- **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W
+- **Buoy 62091** (M2 Buoy): 53.47°N, 5.42°W
+- **Buoy 62092** (M3 Buoy): 53.48°N, 5.42°W
+- **Buoy 62093** (M4 Buoy): 51.22°N, 6.70°W
+- **Buoy 62094** (M5 Buoy): 51.69°N, 6.70°W
+- **Buoy 62095** (M6 Buoy): 53.06°N, 7.90°W
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 36.2 knots (67.1 km/h) at Buoy 62092
-- **Maximum Significant Wave Height (Hm0):** 7.7 m at Buoy 62092
-- **Maximum Wave Height (Hmax):** 12.5 m at Buoy 62092
-- **Minimum Pressure:** 970.6 hPa at Buoy 62092
-- **Temperature Range:** 10.7°C (Buoy 62091) to 15.8°C (Buoy 62091)
-- **Total Observations:** 600 records from 4 stations (QC good data only)
+| Buoy (Location) | Sustained Wind Speeds | Gust Wind Speeds | Significant Wave Height | Individual Wave | MSLP (hPa) |
+|---|---|---|---|---|---|
+| M2 Buoy | **61 km/h**<br>(33 knots or 17 mph)<br>Fri 20 Oct 2023 17 UTC | **80 km/h**<br>(43 knots or 22 mph)<br>Fri 20 Oct 2023 17 UTC | **4.8 m**<br>Fri 20 Oct 2023 18 UTC | **7.8 m**<br>Fri 20 Oct 2023 16 UTC | **976.3**<br>Thu 19 Oct 2023 09 UTC |
+| M3 Buoy | **67 km/h**<br>(36 knots or 19 mph)<br>Fri 20 Oct 2023 17 UTC | **86 km/h**<br>(47 knots or 24 mph)<br>Fri 20 Oct 2023 17 UTC | **7.7 m**<br>Fri 20 Oct 2023 19 UTC | **12.5 m**<br>Fri 20 Oct 2023 19 UTC | **970.6**<br>Thu 19 Oct 2023 06 UTC |
+| M4 Buoy | **48 km/h**<br>(26 knots or 13 mph)<br>Wed 18 Oct 2023 00 UTC | **66 km/h**<br>(36 knots or 18 mph)<br>Fri 20 Oct 2023 13 UTC | **5.1 m**<br>Fri 20 Oct 2023 16 UTC | **8.2 m**<br>Fri 20 Oct 2023 16 UTC | **975.3**<br>Thu 19 Oct 2023 15 UTC |
+| M5 Buoy | **59 km/h**<br>(32 knots or 16 mph)<br>Tue 17 Oct 2023 21 UTC | **77 km/h**<br>(42 knots or 21 mph)<br>Tue 17 Oct 2023 23 UTC | **4.0 m**<br>Tue 17 Oct 2023 20 UTC | **7.3 m**<br>Wed 18 Oct 2023 01 UTC | **974.9**<br>Thu 19 Oct 2023 13 UTC |
+| M6 Buoy | **57 km/h**<br>(31 knots or 16 mph)<br>Thu 19 Oct 2023 17 UTC | **82 km/h**<br>(44 knots or 23 mph)<br>Thu 19 Oct 2023 17 UTC | **6.9 m**<br>Thu 19 Oct 2023 15 UTC | **11.6 m**<br>Thu 19 Oct 2023 23 UTC | **976.0**<br>Thu 19 Oct 2023 03 UTC |
 
 
 ### Station-by-Station Analysis
 
-### Buoy 62091 - M1 Buoy (Retired)
+### Buoy 62091 - M2 Buoy
 - **Location:** 53.47°N, 5.42°W
-- **Peak Wind Speed:** 32.8 knots (60.8 km/h)
-- **Peak Significant Wave Height (Hm0):** 4.8 m  
-- **Peak Maximum Wave Height (Hmax):** 7.8 m
-- **Minimum Pressure:** 976.3 hPa
+- **Peak Wind Speed:** 32.8 knots (60.8 km/h) on Fri 20 Oct 2023 17:00 UTC
+- **Peak Significant Wave Height (Hm0):** 4.8 m on Fri 20 Oct 2023 18:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 7.8 m on Fri 20 Oct 2023 16:00 UTC
+- **Minimum Pressure:** 976.3 hPa on Thu 19 Oct 2023 09:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 121 records (QC good data only)
 
 
-### Buoy 62092 - M2 Buoy
+### Buoy 62092 - M3 Buoy
 - **Location:** 53.48°N, 5.42°W
-- **Peak Wind Speed:** 36.2 knots (67.1 km/h)
-- **Peak Significant Wave Height (Hm0):** 7.7 m  
-- **Peak Maximum Wave Height (Hmax):** 12.5 m
-- **Minimum Pressure:** 970.6 hPa
+- **Peak Wind Speed:** 36.2 knots (67.1 km/h) on Fri 20 Oct 2023 17:00 UTC
+- **Peak Significant Wave Height (Hm0):** 7.7 m on Fri 20 Oct 2023 19:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 12.5 m on Fri 20 Oct 2023 19:00 UTC
+- **Minimum Pressure:** 970.6 hPa on Thu 19 Oct 2023 06:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 121 records (QC good data only)
 
 
-### Buoy 62094 - M4 Buoy
+### Buoy 62093 - M4 Buoy
+- **Location:** 51.22°N, 6.70°W
+- **Peak Wind Speed:** 25.7 knots (47.7 km/h) on Wed 18 Oct 2023 00:00 UTC
+- **Peak Significant Wave Height (Hm0):** 5.1 m on Fri 20 Oct 2023 16:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 8.2 m on Fri 20 Oct 2023 16:00 UTC
+- **Minimum Pressure:** 975.3 hPa on Thu 19 Oct 2023 15:00 UTC
+- **Data Quality:** Excellent (100.0% good data)
+- **Observations:** 121 records (QC good data only)
+
+
+### Buoy 62094 - M5 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Peak Wind Speed:** 31.8 knots (58.9 km/h)
-- **Peak Significant Wave Height (Hm0):** 4.0 m  
-- **Peak Maximum Wave Height (Hmax):** 7.3 m
-- **Minimum Pressure:** 974.9 hPa
+- **Peak Wind Speed:** 31.8 knots (58.9 km/h) on Tue 17 Oct 2023 21:00 UTC
+- **Peak Significant Wave Height (Hm0):** 4.0 m on Tue 17 Oct 2023 20:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 7.3 m on Wed 18 Oct 2023 01:00 UTC
+- **Minimum Pressure:** 974.9 hPa on Thu 19 Oct 2023 13:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 121 records (QC good data only)
 
 
-### Buoy 62095 - M5 Buoy
+### Buoy 62095 - M6 Buoy
 - **Location:** 53.06°N, 7.90°W
-- **Peak Wind Speed:** 30.6 knots (56.7 km/h)
-- **Peak Significant Wave Height (Hm0):** 6.9 m  
-- **Peak Maximum Wave Height (Hmax):** 11.6 m
-- **Minimum Pressure:** 976.0 hPa
+- **Peak Wind Speed:** 30.6 knots (56.7 km/h) on Thu 19 Oct 2023 17:00 UTC
+- **Peak Significant Wave Height (Hm0):** 6.9 m on Thu 19 Oct 2023 15:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 11.6 m on Thu 19 Oct 2023 23:00 UTC
+- **Minimum Pressure:** 976.0 hPa on Thu 19 Oct 2023 03:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 237 records (QC good data only)
+- **Observations:** 121 records (QC good data only)
 
 
 ## Meteorological Analysis
@@ -99,10 +111,10 @@ The storm produced maximum sustained winds of **36.2 knots** (67.1 km/h).
 
 ## Quality Control Summary
 
-**Total Records:** 600
+**Total Records:** 605
 
 **QC Status Distribution:**
-- Good Data (QC=1): 600 records (100.0%)
+- Good Data (QC=1): 605 records (100.0%)
 - Adjusted Data (QC=5): 0 records (0.0%)
 - Missing Data (QC=9): 0 records (0.0%)
 - No QC (QC=0): 0 records (0.0%)
@@ -113,16 +125,19 @@ The storm produced maximum sustained winds of **36.2 knots** (67.1 km/h).
 
 ### Active Logger Information During Storm Period
 
-**Buoy 62091 (M1 Buoy (Retired)):**
+**Buoy 62091 (M2 Buoy):**
 - Logger(s) used: 347_Wavesense  , 8704_CR6       
 
-**Buoy 62092 (M2 Buoy):**
+**Buoy 62092 (M3 Buoy):**
 - Logger(s) used: 314_Wavesense  , 12146_CR6      
 
-**Buoy 62094 (M4 Buoy):**
+**Buoy 62093 (M4 Buoy):**
+- Logger(s) used: 189_Wavesense  , 12144_CR6      
+
+**Buoy 62094 (M5 Buoy):**
 - Logger(s) used: 12142_CR6      , 12143_CR6      
 
-**Buoy 62095 (M5 Buoy):**
+**Buoy 62095 (M6 Buoy):**
 - Logger(s) used: 12145_CR6      , 341_Wavesense  
 
 **Note:** This report uses only quality-controlled data (QC indicators 1 and 5) for meteorological analysis. Logger information shows which data acquisition systems were active during the storm period.

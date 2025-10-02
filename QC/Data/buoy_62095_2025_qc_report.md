@@ -1,16 +1,17 @@
 # Buoy 62095 - 2025 Quality Control Report
 
-**Generated:** 2025-09-08 12:41:09
+**Generated:** 2025-10-02 13:41:10
 
 ## Data Overview
 
 - **Station ID:** 62095
 - **Year:** 2025
-- **Total Records:** 3,156
-- **Time Range:** 2025-01-01 00:00:00 to 2025-05-12 11:00:00
-- **Duration:** 131 days
-- **Sensors/Loggers:** 1 active
-  - 12146_CR6: 3,156 records (100.0%)
+- **Total Records:** 5,424
+- **Time Range:** 2025-01-01 00:00:00 to 2025-08-14 23:00:00
+- **Duration:** 225 days
+- **Sensors/Loggers:** 2 active
+  - 12146_CR6: 3,156 records (58.2%)
+  - 12143_CR6: 2,268 records (41.8%)
 - **Live Logger Used:** 12146_CR6
   - Active Period: 2024-04-24 08:00 to 2025-05-12 11:00
   - Wave Data Available: Yes
@@ -20,39 +21,42 @@
 
 ### Record-Level QC Status
 
-- **QC complete:** 3,017 records (95.6%)
-- **No QC performed:** 139 records (4.4%)
+- **QC complete:** 5,007 records (92.3%)
+- **No QC performed:** 417 records (7.7%)
 
 ### Parameter-Level QC Results
 
 | Parameter | Total | Missing | Range Fail | Spike Fail | Flat Line Fail | Passed | Pass Rate |
 |-----------|--------|---------|------------|------------|----------------|--------|-----------|
-| airpressure | 3,156 | 0 | 3 | 1 | 0 | 3,152 | 99.9% |
-| airtemp | 3,156 | 0 | 0 | 1 | 16 | 3,139 | 99.5% |
-| humidity | 3,156 | 0 | 0 | 7 | 0 | 3,149 | 99.8% |
-| windsp | 3,156 | 0 | 2 | 3 | 0 | 3,152 | 99.9% |
-| winddir | 3,156 | 0 | 0 | 91 | 0 | 3,065 | 97.1% |
-| hm0 | 3,156 | 0 | 0 | 0 | 118 | 3,038 | 96.3% |
-| hmax | 3,156 | 0 | 0 | 2 | 25 | 3,129 | 99.1% |
-| tp | 3,156 | 0 | 0 | 0 | 203 | 2,953 | 93.6% |
-| mdir | 3,156 | 0 | 0 | 52 | 0 | 3,104 | 98.4% |
-| seatemp_aa | 3,156 | 0 | 0 | 0 | 5 | 3,151 | 99.8% |
+| airpressure | 5,424 | 0 | 3 | 1 | 0 | 5,420 | 99.9% |
+| airtemp | 5,424 | 0 | 0 | 1 | 21 | 5,402 | 99.6% |
+| humidity | 5,424 | 0 | 0 | 9 | 0 | 5,415 | 99.8% |
+| windsp | 5,424 | 0 | 2 | 3 | 0 | 5,420 | 99.9% |
+| windgust | 5,424 | 0 | 3 | 2 | 0 | 5,420 | 99.9% |
+| winddir | 5,424 | 0 | 0 | 114 | 0 | 5,310 | 97.9% |
+| hm0 | 5,424 | 0 | 0 | 0 | 391 | 5,033 | 92.8% |
+| hmax | 5,424 | 0 | 0 | 2 | 42 | 5,380 | 99.2% |
+| tp | 5,424 | 0 | 0 | 0 | 549 | 4,875 | 89.9% |
+| mdir | 5,424 | 0 | 0 | 57 | 0 | 5,367 | 98.9% |
+| seatemp_aa | 5,424 | 0 | 0 | 0 | 5 | 5,419 | 99.9% |
 
 ### Issues Identified
 
 - airpressure: 3 values outside range [950.0-1050.0]
 - airpressure: 1 spike values (>10.0 change)
 - airtemp: 1 spike values (>4.0 change)
-- airtemp: 16 flat line values (5+ consecutive identical)
-- humidity: 7 spike values (>20.0 change)
+- airtemp: 21 flat line values (5+ consecutive identical)
+- humidity: 9 spike values (>20.0 change)
 - windsp: 2 values outside range [0.0-50.0]
 - windsp: 3 spike values (>15.0 change)
-- winddir: 91 spike values (>180.0 change)
-- hm0: 118 flat line values (5+ consecutive identical)
+- windgust: 3 values outside range [0.0-60.0]
+- windgust: 2 spike values (>20.0 change)
+- winddir: 114 spike values (>180.0 change)
+- hm0: 391 flat line values (5+ consecutive identical)
 - hmax: 2 spike values (>4.5 change)
-- hmax: 25 flat line values (5+ consecutive identical)
-- tp: 203 flat line values (5+ consecutive identical)
-- mdir: 52 spike values (>180.0 change)
+- hmax: 42 flat line values (5+ consecutive identical)
+- tp: 549 flat line values (5+ consecutive identical)
+- mdir: 57 spike values (>180.0 change)
 - seatemp_aa: 5 flat line values (5+ consecutive identical)
 
 ## QC Limits Applied
@@ -65,6 +69,7 @@ Station-specific QC limits used for this analysis:
 | airtemp | -15.0 | 35.0 | 4.0 | Station-specific |
 | humidity | 0.0 | 100.0 | 20.0 | Default |
 | windsp | 0.0 | 50.0 | 15.0 | Default |
+| windgust | 0.0 | 60.0 | 20.0 | Default |
 | winddir | 0.0 | 360.0 | 180.0 | Default |
 | hm0 | 0.0 | 14.0 | 3.0 | Station-specific |
 | hmax | 0.0 | 22.0 | 4.5 | Station-specific |

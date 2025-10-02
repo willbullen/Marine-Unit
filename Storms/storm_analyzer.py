@@ -145,13 +145,13 @@ class MarineStormAnalyzer:
         }
         
         # Buoy station information - Updated based on official Met Éireann sources
-        # Note: M1 Buoy is retired, locations verified against https://www.met.ie/forecasts/marine-inland-lakes/buoys/buoy-locations
+        # Note: M1 Buoy is retired, current buoys are M2-M6
         self.buoy_stations = {
-            "62091": {"name": "M1 Buoy (Retired)", "location": "53.47°N, 5.42°W", "status": "retired"},
-            "62092": {"name": "M2 Buoy", "location": "53.48°N, 5.42°W", "status": "active"}, 
-            "62093": {"name": "M3 Buoy", "location": "51.22°N, 6.70°W", "status": "active"},
-            "62094": {"name": "M4 Buoy", "location": "51.69°N, 6.70°W", "status": "active"},
-            "62095": {"name": "M5 Buoy", "location": "53.06°N, 7.90°W", "status": "active"}
+            "62091": {"name": "M2 Buoy", "location": "53.47°N, 5.42°W", "status": "active"},
+            "62092": {"name": "M3 Buoy", "location": "53.48°N, 5.42°W", "status": "active"}, 
+            "62093": {"name": "M4 Buoy", "location": "51.22°N, 6.70°W", "status": "active"},
+            "62094": {"name": "M5 Buoy", "location": "51.69°N, 6.70°W", "status": "active"},
+            "62095": {"name": "M6 Buoy", "location": "53.06°N, 7.90°W", "status": "active"}
         }
         
         # Initialize logger information
@@ -496,7 +496,7 @@ class MarineStormAnalyzer:
         else:
             md_content = self._generate_full_storm_report(storm_name, storm_info, storm_data, stats, overview_plot)
         
-        return md_content
+        return md_content, stats  # Return stats as well for PDF generation
 
     def _generate_minor_storm_report(self, storm_name, storm_info, storm_data, stats, overview_plot):
         """Generate streamlined report for minor storms"""
@@ -635,37 +635,101 @@ class MarineStormAnalyzer:
             'peak_hmax_buoy': '',
             'min_pressure_buoy': '',
             'max_temp_buoy': '',
-            'min_temp_buoy': ''
+            'min_temp_buoy': '',
+            # Peak conditions table data (per buoy)
+            'buoy_peaks': {}
         }
         
         for station_key, df in storm_data.items():
             station = station_key.split('_')[0]
             
+            # Initialize buoy peaks dictionary for this station
+            stats['buoy_peaks'][station] = {
+                'sustained_wind': {'value': 0, 'time': None},
+                'gust_wind': {'value': 0, 'time': None},
+                'hm0': {'value': 0, 'time': None},
+                'hmax': {'value': 0, 'time': None},
+                'min_pressure': {'value': float('inf'), 'time': None}
+            }
+            
             # Overall statistics with buoy tracking - only use parameter-level good data
             if not df.empty:
-                # Track peak wind speed and buoy (only ind_windsp = 1)
-                good_windsp = df[df['ind_windsp'] == 1]['windsp']
-                if not good_windsp.empty and good_windsp.max() > stats['peak_wind_speed']:
-                    stats['peak_wind_speed'] = good_windsp.max()
-                    stats['peak_wind_buoy'] = station
+                # Track peak sustained wind speed and buoy (only ind_windsp = 1)
+                good_windsp_df = df[df['ind_windsp'] == 1]
+                if not good_windsp_df.empty:
+                    max_windsp_idx = good_windsp_df['windsp'].idxmax()
+                    max_windsp = good_windsp_df.loc[max_windsp_idx, 'windsp']
+                    max_windsp_time = good_windsp_df.loc[max_windsp_idx, 'time']
+                    
+                    stats['buoy_peaks'][station]['sustained_wind'] = {
+                        'value': max_windsp,
+                        'time': max_windsp_time
+                    }
+                    
+                    if max_windsp > stats['peak_wind_speed']:
+                        stats['peak_wind_speed'] = max_windsp
+                        stats['peak_wind_buoy'] = station
+                
+                # Track peak gust wind speed (check if windgust column exists)
+                if 'windgust' in df.columns and 'ind_windgust' in df.columns:
+                    good_windgust_df = df[df['ind_windgust'] == 1]
+                    if not good_windgust_df.empty:
+                        max_gust_idx = good_windgust_df['windgust'].idxmax()
+                        max_gust = good_windgust_df.loc[max_gust_idx, 'windgust']
+                        max_gust_time = good_windgust_df.loc[max_gust_idx, 'time']
+                        
+                        stats['buoy_peaks'][station]['gust_wind'] = {
+                            'value': max_gust,
+                            'time': max_gust_time
+                        }
                 
                 # Track peak Hm0 and buoy (only ind_hm0 = 1)
-                good_hm0 = df[df['ind_hm0'] == 1]['hm0']
-                if not good_hm0.empty and good_hm0.max() > stats['peak_hm0']:
-                    stats['peak_hm0'] = good_hm0.max()
-                    stats['peak_hm0_buoy'] = station
+                good_hm0_df = df[df['ind_hm0'] == 1]
+                if not good_hm0_df.empty:
+                    max_hm0_idx = good_hm0_df['hm0'].idxmax()
+                    max_hm0 = good_hm0_df.loc[max_hm0_idx, 'hm0']
+                    max_hm0_time = good_hm0_df.loc[max_hm0_idx, 'time']
+                    
+                    stats['buoy_peaks'][station]['hm0'] = {
+                        'value': max_hm0,
+                        'time': max_hm0_time
+                    }
+                    
+                    if max_hm0 > stats['peak_hm0']:
+                        stats['peak_hm0'] = max_hm0
+                        stats['peak_hm0_buoy'] = station
                 
                 # Track peak Hmax and buoy (only ind_hmax = 1)
-                good_hmax = df[df['ind_hmax'] == 1]['hmax']
-                if not good_hmax.empty and good_hmax.max() > stats['peak_hmax']:
-                    stats['peak_hmax'] = good_hmax.max()
-                    stats['peak_hmax_buoy'] = station
+                good_hmax_df = df[df['ind_hmax'] == 1]
+                if not good_hmax_df.empty:
+                    max_hmax_idx = good_hmax_df['hmax'].idxmax()
+                    max_hmax = good_hmax_df.loc[max_hmax_idx, 'hmax']
+                    max_hmax_time = good_hmax_df.loc[max_hmax_idx, 'time']
+                    
+                    stats['buoy_peaks'][station]['hmax'] = {
+                        'value': max_hmax,
+                        'time': max_hmax_time
+                    }
+                    
+                    if max_hmax > stats['peak_hmax']:
+                        stats['peak_hmax'] = max_hmax
+                        stats['peak_hmax_buoy'] = station
                 
                 # Track minimum pressure and buoy (only ind_airpressure = 1)
-                good_pressure = df[df['ind_airpressure'] == 1]['airpressure']
-                if not good_pressure.empty and good_pressure.min() < stats['min_pressure']:
-                    stats['min_pressure'] = good_pressure.min()
-                    stats['min_pressure_buoy'] = station
+                good_pressure_df = df[df['ind_airpressure'] == 1]
+                if not good_pressure_df.empty:
+                    min_pressure_idx = good_pressure_df['airpressure'].idxmin()
+                    min_pressure = good_pressure_df.loc[min_pressure_idx, 'airpressure']
+                    min_pressure_time = good_pressure_df.loc[min_pressure_idx, 'time']
+                    
+                    stats['buoy_peaks'][station]['min_pressure'] = {
+                        'value': min_pressure,
+                        'time': min_pressure_time
+                    }
+                    
+                    if min_pressure < stats['min_pressure']:
+                        stats['min_pressure'] = min_pressure
+                        stats['min_pressure_buoy'] = station
                 
                 # Track temperature extremes and buoys (only ind_airtemp = 1)
                 good_temp = df[df['ind_airtemp'] == 1]['airtemp']
@@ -686,24 +750,24 @@ class MarineStormAnalyzer:
                     'data_quality': self._assess_data_quality(df)
                 }
                 
-                # Only include parameters with good QC data
-                if not good_windsp.empty:
-                    station_stats['max_wind'] = good_windsp.max()
+                # Only include parameters with good QC data - use the dataframes created earlier
+                if not good_windsp_df.empty:
+                    station_stats['max_wind'] = good_windsp_df['windsp'].max()
                 else:
                     station_stats['max_wind'] = 0.0
                 
-                if not good_hm0.empty:
-                    station_stats['max_hm0'] = good_hm0.max()
+                if not good_hm0_df.empty:
+                    station_stats['max_hm0'] = good_hm0_df['hm0'].max()
                 else:
                     station_stats['max_hm0'] = 0.0
                 
-                if not good_hmax.empty:
-                    station_stats['max_hmax'] = good_hmax.max()
+                if not good_hmax_df.empty:
+                    station_stats['max_hmax'] = good_hmax_df['hmax'].max()
                 else:
                     station_stats['max_hmax'] = 0.0
                 
-                if not good_pressure.empty:
-                    station_stats['min_pressure'] = good_pressure.min()
+                if not good_pressure_df.empty:
+                    station_stats['min_pressure'] = good_pressure_df['airpressure'].min()
                 else:
                     station_stats['min_pressure'] = float('inf')
                 
@@ -745,15 +809,58 @@ class MarineStormAnalyzer:
         return '\n'.join(sources) if sources else "No data sources available"
 
     def _format_peak_conditions(self, stats):
-        """Format peak conditions section"""
-        return f"""
-- **Maximum Wind Speed:** {stats['peak_wind_speed']:.1f} knots ({stats['peak_wind_speed'] * 1.852:.1f} km/h) at Buoy {stats['peak_wind_buoy']}
-- **Maximum Significant Wave Height (Hm0):** {stats['peak_hm0']:.1f} m at Buoy {stats['peak_hm0_buoy']}
-- **Maximum Wave Height (Hmax):** {stats['peak_hmax']:.1f} m at Buoy {stats['peak_hmax_buoy']}
-- **Minimum Pressure:** {stats['min_pressure']:.1f} hPa at Buoy {stats['min_pressure_buoy']}
-- **Temperature Range:** {stats['min_temperature']:.1f}°C (Buoy {stats['min_temp_buoy']}) to {stats['max_temperature']:.1f}°C (Buoy {stats['max_temp_buoy']})
-- **Total Observations:** {stats['total_observations']:,} records from {stats['total_stations']} stations (QC good data only)
-"""
+        """Format peak conditions section for markdown"""
+        # Create markdown table
+        table = "\n| Buoy (Location) | Sustained Wind Speeds | Gust Wind Speeds | Significant Wave Height | Individual Wave | MSLP (hPa) |\n"
+        table += "|---|---|---|---|---|---|\n"
+        
+        for station in sorted(stats['buoy_peaks'].keys()):
+            peaks = stats['buoy_peaks'][station]
+            station_info = self.buoy_stations.get(station, {})
+            location = station_info.get('name', f'Buoy {station}')
+            
+            # Sustained wind
+            if peaks['sustained_wind']['value'] > 0 and peaks['sustained_wind']['time']:
+                sustained_kmh = peaks['sustained_wind']['value'] * 1.852
+                sustained_knots = peaks['sustained_wind']['value']
+                sustained_time = peaks['sustained_wind']['time'].strftime('%a %d %b %Y %H UTC')
+                sustained_str = f"**{sustained_kmh:.0f} km/h**<br>({sustained_knots:.0f} knots or {sustained_knots * 0.514444:.0f} mph)<br>{sustained_time}"
+            else:
+                sustained_str = "No data"
+            
+            # Gust wind
+            if peaks['gust_wind']['value'] > 0 and peaks['gust_wind']['time']:
+                gust_kmh = peaks['gust_wind']['value'] * 1.852
+                gust_knots = peaks['gust_wind']['value']
+                gust_time = peaks['gust_wind']['time'].strftime('%a %d %b %Y %H UTC')
+                gust_str = f"**{gust_kmh:.0f} km/h**<br>({gust_knots:.0f} knots or {gust_knots * 0.514444:.0f} mph)<br>{gust_time}"
+            else:
+                gust_str = "No data"
+            
+            # Significant wave height
+            if peaks['hm0']['value'] > 0 and peaks['hm0']['time']:
+                hm0_time = peaks['hm0']['time'].strftime('%a %d %b %Y %H UTC')
+                hm0_str = f"**{peaks['hm0']['value']:.1f} m**<br>{hm0_time}"
+            else:
+                hm0_str = "No data"
+            
+            # Individual wave (Hmax)
+            if peaks['hmax']['value'] > 0 and peaks['hmax']['time']:
+                hmax_time = peaks['hmax']['time'].strftime('%a %d %b %Y %H UTC')
+                hmax_str = f"**{peaks['hmax']['value']:.1f} m**<br>{hmax_time}"
+            else:
+                hmax_str = "No data"
+            
+            # MSLP
+            if peaks['min_pressure']['value'] != float('inf') and peaks['min_pressure']['time']:
+                pressure_time = peaks['min_pressure']['time'].strftime('%a %d %b %Y %H UTC')
+                pressure_str = f"**{peaks['min_pressure']['value']:.1f}**<br>{pressure_time}"
+            else:
+                pressure_str = "No data"
+            
+            table += f"| {location} | {sustained_str} | {gust_str} | {hm0_str} | {hmax_str} | {pressure_str} |\n"
+        
+        return table
 
     def _format_station_analysis(self, storm_data, stats):
         """Format station-by-station analysis"""
@@ -765,13 +872,40 @@ class MarineStormAnalyzer:
                 station_stat = stats['station_stats'][station]
                 station_info = self.buoy_stations.get(station, {})
                 
+                # Get peak timestamps from buoy_peaks
+                peaks = stats['buoy_peaks'].get(station, {})
+                
+                # Format wind speed with timestamp
+                wind_str = f"{station_stat['max_wind']:.1f} knots ({station_stat['max_wind'] * 1.852:.1f} km/h)"
+                if peaks.get('sustained_wind', {}).get('time'):
+                    wind_time = peaks['sustained_wind']['time'].strftime('%a %d %b %Y %H:%M UTC')
+                    wind_str += f" on {wind_time}"
+                
+                # Format Hm0 with timestamp
+                hm0_str = f"{station_stat['max_hm0']:.1f} m"
+                if peaks.get('hm0', {}).get('time'):
+                    hm0_time = peaks['hm0']['time'].strftime('%a %d %b %Y %H:%M UTC')
+                    hm0_str += f" on {hm0_time}"
+                
+                # Format Hmax with timestamp
+                hmax_str = f"{station_stat['max_hmax']:.1f} m"
+                if peaks.get('hmax', {}).get('time'):
+                    hmax_time = peaks['hmax']['time'].strftime('%a %d %b %Y %H:%M UTC')
+                    hmax_str += f" on {hmax_time}"
+                
+                # Format pressure with timestamp
+                pressure_str = f"{station_stat['min_pressure']:.1f} hPa"
+                if peaks.get('min_pressure', {}).get('time'):
+                    pressure_time = peaks['min_pressure']['time'].strftime('%a %d %b %Y %H:%M UTC')
+                    pressure_str += f" on {pressure_time}"
+                
                 analysis.append(f"""
 ### Buoy {station} - {station_info.get('name', 'Unknown')}
 - **Location:** {station_info.get('location', 'Unknown')}
-- **Peak Wind Speed:** {station_stat['max_wind']:.1f} knots ({station_stat['max_wind'] * 1.852:.1f} km/h)
-- **Peak Significant Wave Height (Hm0):** {station_stat['max_hm0']:.1f} m  
-- **Peak Maximum Wave Height (Hmax):** {station_stat['max_hmax']:.1f} m
-- **Minimum Pressure:** {station_stat['min_pressure']:.1f} hPa
+- **Peak Wind Speed:** {wind_str}
+- **Peak Significant Wave Height (Hm0):** {hm0_str}
+- **Peak Maximum Wave Height (Hmax):** {hmax_str}
+- **Minimum Pressure:** {pressure_str}
 - **Data Quality:** {station_stat['data_quality']}
 - **Observations:** {station_stat['observations']:,} records (QC good data only)
 """)
@@ -913,7 +1047,7 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
 
 
 
-    def convert_md_to_pdf(self, md_content, output_path, storm_name):
+    def convert_md_to_pdf(self, md_content, output_path, storm_name, stats=None):
         """Convert markdown content to PDF using reportlab with modern, attractive styling"""
         try:
             from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
@@ -1089,6 +1223,7 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
             current_section = []
             in_bullet_list = False
             in_peak_conditions = False
+            skip_until_next_section = False
             
             for line in lines:
                 line = line.strip()
@@ -1104,13 +1239,28 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                         current_section = []
                     story.append(Paragraph(line[3:], heading1_style))
                     in_bullet_list = False
-                    in_peak_conditions = 'Peak Conditions' in line
+                    skip_until_next_section = False
                 elif line.startswith('### '):
                     if current_section:
                         story.append(Paragraph(' '.join(current_section), body_style))
                         story.append(Spacer(1, 8))
                         current_section = []
-                    story.append(Paragraph(line[4:], heading2_style))
+                    
+                    # Check if this is Peak Conditions Observed section
+                    if 'Peak Conditions' in line and stats:
+                        # Add the heading
+                        story.append(Paragraph(line[4:], heading2_style))
+                        # Insert the ReportLab table
+                        story.append(Spacer(1, 10))
+                        peak_table = self._create_peak_conditions_table(stats, styles)
+                        story.append(peak_table)
+                        story.append(Spacer(1, 15))
+                        skip_until_next_section = True  # Skip markdown table content
+                    else:
+                        # Regular heading - reset skip flag
+                        story.append(Paragraph(line[4:], heading2_style))
+                        skip_until_next_section = False
+                    
                     in_bullet_list = False
                 elif line.startswith('#### '):
                     if current_section:
@@ -1119,7 +1269,13 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                         current_section = []
                     story.append(Paragraph(line[5:], heading3_style))
                     in_bullet_list = False
+                    skip_until_next_section = False
+                elif line.startswith('|') and skip_until_next_section:
+                    # Skip markdown table rows when we have the ReportLab table
+                    continue
                 elif line.startswith('- '):
+                    if skip_until_next_section:
+                        continue
                     if current_section and not in_bullet_list:
                         story.append(Paragraph(' '.join(current_section), body_style))
                         story.append(Spacer(1, 8))
@@ -1135,6 +1291,8 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                         story.append(Paragraph(f"• {clean_line}", bullet_style))
                     in_bullet_list = True
                 elif line.strip():
+                    if skip_until_next_section:
+                        continue
                     if in_bullet_list:
                         in_bullet_list = False
                         story.append(Spacer(1, 8))
@@ -1147,7 +1305,6 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                         story.append(Spacer(1, 8))
                         current_section = []
                     in_bullet_list = False
-                    in_peak_conditions = False
             
             if current_section:
                 story.append(Paragraph(' '.join(current_section), body_style))
@@ -1272,6 +1429,150 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
         text = text.replace('&lt;i&gt;', '<i>').replace('&lt;/i&gt;', '</i>')
         return text
 
+    def _create_peak_conditions_table(self, stats, styles):
+        """Create ReportLab table for peak conditions in PDF"""
+        # Met Éireann official color palette
+        met_blue = colors.Color(0.0, 0.31, 0.62)        # Met Éireann primary blue #004F9F
+        met_teal = colors.Color(0.21, 0.53, 0.58)       # Teal color matching the image
+        white = colors.Color(1.0, 1.0, 1.0)             # White
+        light_grey = colors.Color(0.95, 0.95, 0.95)     # Very light grey
+        
+        # Create table data
+        table_data = []
+        
+        # Header row
+        header_row = [
+            Paragraph('<b>Buoy<br/>(Location)</b>', styles['Normal']),
+            Paragraph('<b>Sustained<br/>Wind Speeds</b>', styles['Normal']),
+            Paragraph('<b>Gust<br/>Wind Speeds</b>', styles['Normal']),
+            Paragraph('<b>Significant<br/>Wave Height</b>', styles['Normal']),
+            Paragraph('<b>Individual<br/>Wave</b>', styles['Normal']),
+            Paragraph('<b>MSLP (hPa)</b>', styles['Normal'])
+        ]
+        table_data.append(header_row)
+        
+        # Data rows
+        for station in sorted(stats['buoy_peaks'].keys()):
+            peaks = stats['buoy_peaks'][station]
+            station_info = self.buoy_stations.get(station, {})
+            
+            # Format buoy name and location
+            buoy_name = station_info.get('name', f'Buoy {station}')
+            location = ""
+            if "53.47" in station_info.get('location', ''):  # M2 (62091)
+                location = "(in the Irish Sea)"
+            elif "53.48" in station_info.get('location', ''):  # M3 (62092)
+                location = "(in the Irish Sea)"
+            elif "51.22" in station_info.get('location', ''):  # M4 (62093)
+                location = "(off the Cork coast)"
+            elif "51.69" in station_info.get('location', ''):  # M5 (62094)
+                location = "(off the Donegal coast)"
+            elif "53.06" in station_info.get('location', ''):  # M6 (62095)
+                location = "(in the south Wexford coast)"
+            
+            buoy_cell = Paragraph(f'<b>{buoy_name}</b><br/><font size=8>{location}</font>', styles['Normal'])
+            
+            # Sustained wind
+            if peaks['sustained_wind']['value'] > 0 and peaks['sustained_wind']['time']:
+                sustained_kmh = peaks['sustained_wind']['value'] * 1.852
+                sustained_knots = peaks['sustained_wind']['value']
+                sustained_time = peaks['sustained_wind']['time'].strftime('%a %d %b %Y %H UTC')
+                sustained_cell = Paragraph(
+                    f'<b>{sustained_kmh:.0f} km/h</b><br/>'
+                    f'<font size=8>({sustained_knots:.0f} knots or {sustained_knots * 0.514444:.0f} mph)</font><br/>'
+                    f'<font size=8>{sustained_time}</font>',
+                    styles['Normal']
+                )
+            else:
+                sustained_cell = Paragraph('<font size=8>No data</font>', styles['Normal'])
+            
+            # Gust wind
+            if peaks['gust_wind']['value'] > 0 and peaks['gust_wind']['time']:
+                gust_kmh = peaks['gust_wind']['value'] * 1.852
+                gust_knots = peaks['gust_wind']['value']
+                gust_time = peaks['gust_wind']['time'].strftime('%a %d %b %Y %H UTC')
+                gust_cell = Paragraph(
+                    f'<b>{gust_kmh:.0f} km/h</b><br/>'
+                    f'<font size=8>({gust_knots:.0f} knots or {gust_knots * 0.514444:.0f} mph)</font><br/>'
+                    f'<font size=8>{gust_time}</font>',
+                    styles['Normal']
+                )
+            else:
+                gust_cell = Paragraph('<font size=8>No data</font>', styles['Normal'])
+            
+            # Significant wave height
+            if peaks['hm0']['value'] > 0 and peaks['hm0']['time']:
+                hm0_time = peaks['hm0']['time'].strftime('%a %d %b %Y %H UTC')
+                hm0_cell = Paragraph(
+                    f'<b>{peaks["hm0"]["value"]:.1f} m</b><br/>'
+                    f'<font size=8>{hm0_time}</font>',
+                    styles['Normal']
+                )
+            else:
+                hm0_cell = Paragraph('<font size=8>No data</font>', styles['Normal'])
+            
+            # Individual wave (Hmax)
+            if peaks['hmax']['value'] > 0 and peaks['hmax']['time']:
+                hmax_time = peaks['hmax']['time'].strftime('%a %d %b %Y %H UTC')
+                hmax_cell = Paragraph(
+                    f'<b>{peaks["hmax"]["value"]:.1f} m</b><br/>'
+                    f'<font size=8>{hmax_time}</font>',
+                    styles['Normal']
+                )
+            else:
+                hmax_cell = Paragraph('<font size=8>No data</font>', styles['Normal'])
+            
+            # MSLP
+            if peaks['min_pressure']['value'] != float('inf') and peaks['min_pressure']['time']:
+                pressure_time = peaks['min_pressure']['time'].strftime('%a %d %b %Y %H UTC')
+                pressure_cell = Paragraph(
+                    f'<b>{peaks["min_pressure"]["value"]:.1f}</b><br/>'
+                    f'<font size=8>{pressure_time}</font><br/>'
+                    f'<font size=8>13UTC</font>',
+                    styles['Normal']
+                )
+            else:
+                pressure_cell = Paragraph('<font size=8>No data</font>', styles['Normal'])
+            
+            row = [buoy_cell, sustained_cell, gust_cell, hm0_cell, hmax_cell, pressure_cell]
+            table_data.append(row)
+        
+        # Create table
+        table = Table(table_data, colWidths=[1.2*inch, 1.5*inch, 1.5*inch, 1.2*inch, 1.2*inch, 1.2*inch])
+        
+        # Apply table style
+        table_style = TableStyle([
+            # Header row styling
+            ('BACKGROUND', (0, 0), (-1, 0), met_teal),
+            ('TEXTCOLOR', (0, 0), (-1, 0), white),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, 0), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('TOPPADDING', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            
+            # Data rows styling
+            ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 1), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 9),
+            ('TOPPADDING', (0, 1), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+            ('LEFTPADDING', (0, 1), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 1), (-1, -1), 6),
+            
+            # Grid
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('BOX', (0, 0), (-1, -1), 2, met_teal),
+            
+            # Alternating row colors
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [white, light_grey]),
+        ])
+        
+        table.setStyle(table_style)
+        return table
+
     def save_storm_data_csv(self, storm_data, output_path):
         """Save combined storm data to CSV"""
         if not storm_data:
@@ -1343,7 +1644,7 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                 overview_plot = self.create_storm_visualizations(storm_name, storm_data, storm_dir, {'info': storm_info})
                 
                 # Generate report
-                md_content = self.generate_storm_report(
+                md_content, stats = self.generate_storm_report(
                     storm_name, 
                     {'info': storm_info}, 
                     storm_data, 
@@ -1359,14 +1660,14 @@ Atmospheric pressure dropped to a minimum of **{stats['min_pressure']:.1f} hPa**
                 
                 # Convert to PDF
                 pdf_path = storm_dir / f"{storm_name.replace(' ', '_')}_report.pdf"
-                self.convert_md_to_pdf(md_content, pdf_path, storm_name)
+                self.convert_md_to_pdf(md_content, pdf_path, storm_name, stats)
                 
                 # Save storm data CSV
                 csv_path = storm_dir / f"{storm_name.replace(' ', '_')}_data.csv"
                 self.save_storm_data_csv(storm_data, csv_path)
                 
                 processed_storms += 1
-                print(f"    ✓ {storm_name} processing complete")
+                print(f"    [OK] {storm_name} processing complete")
         
         print("\n" + "=" * 60)
         print(f"PROCESSING COMPLETE")

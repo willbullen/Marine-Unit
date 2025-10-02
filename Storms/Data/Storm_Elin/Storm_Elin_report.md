@@ -1,65 +1,77 @@
 # Storm Elin - Marine Storm Report
 
-**Report Generated:** 2025-09-01 13:32:28
+**Report Generated:** 2025-10-02 14:38:50
 
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62091** (M1 Buoy (Retired)): 53.47°N, 5.42°W
-- **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W
-- **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W
+- **Buoy 62091** (M2 Buoy): 53.47°N, 5.42°W
+- **Buoy 62092** (M3 Buoy): 53.48°N, 5.42°W
+- **Buoy 62093** (M4 Buoy): 51.22°N, 6.70°W
+- **Buoy 62094** (M5 Buoy): 51.69°N, 6.70°W
+- **Buoy 62095** (M6 Buoy): 53.06°N, 7.90°W
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 32.9 knots (61.0 km/h) at Buoy 62091
-- **Maximum Significant Wave Height (Hm0):** 8.9 m at Buoy 62095
-- **Maximum Wave Height (Hmax):** 15.3 m at Buoy 62095
-- **Minimum Pressure:** 1001.7 hPa at Buoy 62091
-- **Temperature Range:** 9.5°C (Buoy 62091) to 13.2°C (Buoy 62091)
-- **Total Observations:** 462 records from 4 stations (QC good data only)
+| Buoy (Location) | Sustained Wind Speeds | Gust Wind Speeds | Significant Wave Height | Individual Wave | MSLP (hPa) |
+|---|---|---|---|---|---|
+| M2 Buoy | **61 km/h**<br>(33 knots or 17 mph)<br>Thu 21 Dec 2023 13 UTC | **76 km/h**<br>(41 knots or 21 mph)<br>Thu 21 Dec 2023 13 UTC | **3.1 m**<br>Thu 21 Dec 2023 07 UTC | **4.8 m**<br>Thu 21 Dec 2023 08 UTC | **1001.7**<br>Sat 23 Dec 2023 23 UTC |
+| M3 Buoy | **60 km/h**<br>(32 knots or 17 mph)<br>Thu 21 Dec 2023 07 UTC | **79 km/h**<br>(43 knots or 22 mph)<br>Thu 21 Dec 2023 07 UTC | **7.7 m**<br>Thu 21 Dec 2023 07 UTC | **12.8 m**<br>Fri 22 Dec 2023 03 UTC | **1011.6**<br>Sun 24 Dec 2023 00 UTC |
+| M4 Buoy | **59 km/h**<br>(32 knots or 16 mph)<br>Thu 21 Dec 2023 01 UTC | **91 km/h**<br>(49 knots or 25 mph)<br>Thu 21 Dec 2023 06 UTC | **10.2 m**<br>Thu 21 Dec 2023 08 UTC | **15.0 m**<br>Thu 21 Dec 2023 16 UTC | **997.2**<br>Sat 23 Dec 2023 23 UTC |
+| M5 Buoy | **54 km/h**<br>(29 knots or 15 mph)<br>Thu 21 Dec 2023 08 UTC | **74 km/h**<br>(40 knots or 21 mph)<br>Thu 21 Dec 2023 05 UTC | **3.6 m**<br>Sat 23 Dec 2023 23 UTC | **6.2 m**<br>Sun 24 Dec 2023 00 UTC | **1009.0**<br>Sun 24 Dec 2023 00 UTC |
+| M6 Buoy | **56 km/h**<br>(30 knots or 16 mph)<br>Thu 21 Dec 2023 05 UTC | **86 km/h**<br>(47 knots or 24 mph)<br>Thu 21 Dec 2023 05 UTC | **8.8 m**<br>Thu 21 Dec 2023 11 UTC | **15.3 m**<br>Thu 21 Dec 2023 06 UTC | **1002.4**<br>Sun 24 Dec 2023 00 UTC |
 
 
 ### Station-by-Station Analysis
 
-### Buoy 62091 - M1 Buoy (Retired)
+### Buoy 62091 - M2 Buoy
 - **Location:** 53.47°N, 5.42°W
-- **Peak Wind Speed:** 32.9 knots (61.0 km/h)
-- **Peak Significant Wave Height (Hm0):** 3.1 m  
-- **Peak Maximum Wave Height (Hmax):** 4.8 m
-- **Minimum Pressure:** 1001.7 hPa
+- **Peak Wind Speed:** 32.9 knots (61.0 km/h) on Thu 21 Dec 2023 13:00 UTC
+- **Peak Significant Wave Height (Hm0):** 3.1 m on Thu 21 Dec 2023 07:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 4.8 m on Thu 21 Dec 2023 08:00 UTC
+- **Minimum Pressure:** 1001.7 hPa on Sat 23 Dec 2023 23:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 92 records (QC good data only)
 
 
-### Buoy 62092 - M2 Buoy
+### Buoy 62092 - M3 Buoy
 - **Location:** 53.48°N, 5.42°W
-- **Peak Wind Speed:** 32.3 knots (59.9 km/h)
-- **Peak Significant Wave Height (Hm0):** 7.7 m  
-- **Peak Maximum Wave Height (Hmax):** 12.8 m
-- **Minimum Pressure:** 1011.6 hPa
+- **Peak Wind Speed:** 32.3 knots (59.9 km/h) on Thu 21 Dec 2023 07:00 UTC
+- **Peak Significant Wave Height (Hm0):** 7.7 m on Thu 21 Dec 2023 07:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 12.8 m on Fri 22 Dec 2023 03:00 UTC
+- **Minimum Pressure:** 1011.6 hPa on Sun 24 Dec 2023 00:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 97 records (QC good data only)
 
 
-### Buoy 62094 - M4 Buoy
+### Buoy 62093 - M4 Buoy
+- **Location:** 51.22°N, 6.70°W
+- **Peak Wind Speed:** 31.8 knots (58.9 km/h) on Thu 21 Dec 2023 01:00 UTC
+- **Peak Significant Wave Height (Hm0):** 10.2 m on Thu 21 Dec 2023 08:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 15.0 m on Thu 21 Dec 2023 16:00 UTC
+- **Minimum Pressure:** 997.2 hPa on Sat 23 Dec 2023 23:00 UTC
+- **Data Quality:** Excellent (100.0% good data)
+- **Observations:** 97 records (QC good data only)
+
+
+### Buoy 62094 - M5 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Peak Wind Speed:** 29.4 knots (54.4 km/h)
-- **Peak Significant Wave Height (Hm0):** 3.6 m  
-- **Peak Maximum Wave Height (Hmax):** 6.2 m
-- **Minimum Pressure:** 1009.0 hPa
+- **Peak Wind Speed:** 29.4 knots (54.4 km/h) on Thu 21 Dec 2023 08:00 UTC
+- **Peak Significant Wave Height (Hm0):** 3.6 m on Sat 23 Dec 2023 23:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 6.2 m on Sun 24 Dec 2023 00:00 UTC
+- **Minimum Pressure:** 1009.0 hPa on Sun 24 Dec 2023 00:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 91 records (QC good data only)
 
 
-### Buoy 62095 - M5 Buoy
+### Buoy 62095 - M6 Buoy
 - **Location:** 53.06°N, 7.90°W
-- **Peak Wind Speed:** 30.4 knots (56.3 km/h)
-- **Peak Significant Wave Height (Hm0):** 8.9 m  
-- **Peak Maximum Wave Height (Hmax):** 15.3 m
-- **Minimum Pressure:** 1002.4 hPa
+- **Peak Wind Speed:** 30.4 knots (56.3 km/h) on Thu 21 Dec 2023 05:00 UTC
+- **Peak Significant Wave Height (Hm0):** 8.8 m on Thu 21 Dec 2023 11:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 15.3 m on Thu 21 Dec 2023 06:00 UTC
+- **Minimum Pressure:** 1002.4 hPa on Sun 24 Dec 2023 00:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 182 records (QC good data only)
+- **Observations:** 97 records (QC good data only)
 
 
 ## Meteorological Analysis
@@ -79,11 +91,11 @@ The storm produced maximum sustained winds of **32.9 knots** (61.0 km/h).
 
 ### Wave Analysis  
 
-**Significant Wave Heights (Hm0):** Peak values reached **8.9 m**, representing **high**.
+**Significant Wave Heights (Hm0):** Peak values reached **10.2 m**, representing **very high**.
 
 **Maximum Wave Heights (Hmax):** Individual wave heights peaked at **15.3 m**. Note: Hmax values represent individual wave heights and are not used for sea state classification.
 
-**Wave Height Relationship:** The Hmax/Hm0 ratio was **1.72**, within normal range (1.3-1.8).
+**Wave Height Relationship:** The Hmax/Hm0 ratio was **1.50**, within normal range (1.3-1.8).
 
 **Sea State Classification (Hm0):**
 - Rough: 2.5-4.0 m
@@ -99,10 +111,10 @@ The storm produced maximum sustained winds of **32.9 knots** (61.0 km/h).
 
 ## Quality Control Summary
 
-**Total Records:** 462
+**Total Records:** 474
 
 **QC Status Distribution:**
-- Good Data (QC=1): 462 records (100.0%)
+- Good Data (QC=1): 474 records (100.0%)
 - Adjusted Data (QC=5): 0 records (0.0%)
 - Missing Data (QC=9): 0 records (0.0%)
 - No QC (QC=0): 0 records (0.0%)
@@ -113,16 +125,19 @@ The storm produced maximum sustained winds of **32.9 knots** (61.0 km/h).
 
 ### Active Logger Information During Storm Period
 
-**Buoy 62091 (M1 Buoy (Retired)):**
+**Buoy 62091 (M2 Buoy):**
 - Logger(s) used: 347_Wavesense  , 8704_CR6       
 
-**Buoy 62092 (M2 Buoy):**
+**Buoy 62092 (M3 Buoy):**
 - Logger(s) used: 314_Wavesense  , 12146_CR6      
 
-**Buoy 62094 (M4 Buoy):**
+**Buoy 62093 (M4 Buoy):**
+- Logger(s) used: 189_Wavesense  , 12144_CR6      
+
+**Buoy 62094 (M5 Buoy):**
 - Logger(s) used: 12142_CR6      , 12143_CR6      
 
-**Buoy 62095 (M5 Buoy):**
+**Buoy 62095 (M6 Buoy):**
 - Logger(s) used: 12145_CR6      , 341_Wavesense  
 
 **Note:** This report uses only quality-controlled data (QC indicators 1 and 5) for meteorological analysis. Logger information shows which data acquisition systems were active during the storm period.

@@ -50,7 +50,7 @@ class BuoyQCProcessor:
         
         # Key parameters for visualization
         self.key_parameters = [
-            'airpressure', 'airtemp', 'humidity', 'windsp', 'winddir', 
+            'airpressure', 'airtemp', 'humidity', 'windsp', 'windgust', 'winddir', 
             'hm0', 'hmax', 'tp', 'mdir', 'seatemp_aa'
         ]
     
@@ -233,6 +233,32 @@ class BuoyQCProcessor:
         
         return None
     
+    def get_live_loggers_for_period(self, station, start_time, end_time):
+        """Get ALL live loggers that overlap with a time period"""
+        if station not in self.logger_info:
+            return []
+        
+        start_time = pd.to_datetime(start_time)
+        end_time = pd.to_datetime(end_time)
+        
+        live_loggers = []
+        
+        for logger_entry in self.logger_info[station]:
+            if not logger_entry['is_live']:
+                continue
+                
+            logger_start = logger_entry['start_time']
+            logger_end = logger_entry['end_time'] if logger_entry['end_time'] is not None else end_time
+            
+            # Check if there's any overlap
+            overlap_start = max(start_time, logger_start)
+            overlap_end = min(end_time, logger_end)
+            
+            if overlap_start < overlap_end:
+                live_loggers.append(logger_entry)
+        
+        return live_loggers
+    
     def get_live_logger_for_period(self, station, start_time, end_time):
         """Get the logger that was live for the majority of a time period"""
         if station not in self.logger_info:
@@ -394,24 +420,28 @@ class BuoyQCProcessor:
         
         print(f"    Combined: {len(combined_df):,} records from {combined_df['time'].min()} to {combined_df['time'].max()}")
         
-        # Filter data to only include records from the live logger
+        # Filter data to only include records from ALL live loggers
         if self.logger_info and station in self.logger_info:
-            live_logger = self.get_live_logger_for_period(station, combined_df['time'].min(), combined_df['time'].max())
+            live_loggers = self.get_live_loggers_for_period(station, combined_df['time'].min(), combined_df['time'].max())
             
-            if live_logger:
-                print(f"    Live logger for period: {live_logger['logger_id']} (Live: {live_logger['is_live']}, Wave: {live_logger['live_wave']})")
+            if live_loggers:
+                logger_names = [logger['logger_id'] for logger in live_loggers]
+                print(f"    Live loggers for period: {', '.join(logger_names)}")
                 
-                # Filter data to only include records from the live logger
+                # Filter data to include records from ANY of the live loggers
                 if 'loggerid' in combined_df.columns:
-                    # Filter by logger ID
-                    live_logger_id = live_logger['logger_id'].split('_')[0]  # Extract numeric part
-                    filtered_df = combined_df[combined_df['loggerid'].str.contains(live_logger_id, na=False)]
+                    # Create filter for all live loggers
+                    live_logger_ids = [logger['logger_id'].split('_')[0] for logger in live_loggers]  # Extract numeric parts
+                    
+                    # Filter by any of the live logger IDs
+                    mask = combined_df['loggerid'].str.contains('|'.join(live_logger_ids), na=False, regex=True)
+                    filtered_df = combined_df[mask]
                     
                     if len(filtered_df) > 0:
-                        print(f"    Filtered to live logger data: {len(filtered_df):,} records")
+                        print(f"    Filtered to live logger data: {len(filtered_df):,} records from {len(live_loggers)} logger(s)")
                         combined_df = filtered_df.reset_index(drop=True)
                     else:
-                        print(f"    Warning: No data found for live logger {live_logger['logger_id']}")
+                        print(f"    Warning: No data found for live loggers: {', '.join(logger_names)}")
                 else:
                     print(f"    Warning: No loggerid column found, cannot filter by live logger")
             else:

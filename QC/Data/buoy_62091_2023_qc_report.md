@@ -1,6 +1,6 @@
 # Buoy 62091 - 2023 Quality Control Report
 
-**Generated:** 2025-09-08 12:38:23
+**Generated:** 2025-10-02 13:40:15
 
 ## Data Overview
 
@@ -30,6 +30,7 @@
 | airtemp | 8,731 | 0 | 0 | 0 | 17 | 2,909 | 33.3% |
 | humidity | 8,731 | 0 | 0 | 4 | 0 | 2,923 | 33.5% |
 | windsp | 8,731 | 0 | 0 | 0 | 0 | 2,926 | 33.5% |
+| windgust | 8,731 | 0 | 0 | 0 | 0 | 2,926 | 33.5% |
 | winddir | 8,731 | 0 | 0 | 203 | 0 | 3,564 | 40.8% |
 | hm0 | 8,731 | 0 | 0 | 0 | 367 | 2,810 | 32.2% |
 | hmax | 8,731 | 10 | 0 | 0 | 501 | 5,413 | 62.0% |
@@ -57,6 +58,7 @@ Station-specific QC limits used for this analysis:
 | airtemp | -20.0 | 40.0 | 5.0 | Default |
 | humidity | 0.0 | 100.0 | 20.0 | Default |
 | windsp | 0.0 | 60.0 | 20.0 | Station-specific |
+| windgust | 0.0 | 80.0 | 25.0 | Station-specific |
 | winddir | 0.0 | 360.0 | 180.0 | Default |
 | hm0 | 0.0 | 18.0 | 4.0 | Station-specific |
 | hmax | 0.0 | 30.0 | 6.0 | Station-specific |

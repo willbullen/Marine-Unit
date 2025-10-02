@@ -1,6 +1,6 @@
 # Buoy 62092 - 2025 Quality Control Report
 
-**Generated:** 2025-09-08 12:38:41
+**Generated:** 2025-10-02 13:40:35
 
 ## Data Overview
 
@@ -31,6 +31,7 @@
 | airtemp | 5,423 | 0 | 0 | 6 | 32 | 5,385 | 99.3% |
 | humidity | 5,423 | 245 | 0 | 3 | 68 | 5,108 | 94.2% |
 | windsp | 5,423 | 0 | 0 | 3 | 47 | 5,373 | 99.1% |
+| windgust | 5,423 | 0 | 4 | 2 | 47 | 5,370 | 99.0% |
 | winddir | 5,423 | 0 | 0 | 99 | 47 | 5,277 | 97.3% |
 | hm0 | 5,423 | 0 | 15 | 14 | 118 | 5,283 | 97.4% |
 | hmax | 5,423 | 0 | 8 | 23 | 22 | 5,378 | 99.2% |
@@ -46,6 +47,9 @@
 - humidity: 68 flat line values (5+ consecutive identical)
 - windsp: 3 spike values (>15.0 change)
 - windsp: 47 flat line values (5+ consecutive identical)
+- windgust: 4 values outside range [0.0-60.0]
+- windgust: 2 spike values (>20.0 change)
+- windgust: 47 flat line values (5+ consecutive identical)
 - winddir: 99 spike values (>180.0 change)
 - winddir: 47 flat line values (5+ consecutive identical)
 - hm0: 15 values outside range [0.0-12.0]
@@ -69,6 +73,7 @@ Station-specific QC limits used for this analysis:
 | airtemp | -20.0 | 40.0 | 5.0 | Default |
 | humidity | 0.0 | 100.0 | 20.0 | Default |
 | windsp | 0.0 | 50.0 | 15.0 | Default |
+| windgust | 0.0 | 60.0 | 20.0 | Default |
 | winddir | 0.0 | 360.0 | 180.0 | Default |
 | hm0 | 0.0 | 12.0 | 2.5 | Station-specific |
 | hmax | 0.0 | 20.0 | 4.0 | Station-specific |

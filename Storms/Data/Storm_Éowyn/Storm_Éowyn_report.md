@@ -1,65 +1,77 @@
 # Storm Éowyn - Marine Storm Report
 
-**Report Generated:** 2025-09-01 13:32:52
+**Report Generated:** 2025-10-02 14:39:19
 
 ## Marine Observations Summary
 
 ### Data Sources
-- **Buoy 62092** (M2 Buoy): 53.48°N, 5.42°W
-- **Buoy 62093** (M3 Buoy): 51.22°N, 6.70°W
-- **Buoy 62094** (M4 Buoy): 51.69°N, 6.70°W
-- **Buoy 62095** (M5 Buoy): 53.06°N, 7.90°W
+- **Buoy 62091** (M2 Buoy): 53.47°N, 5.42°W
+- **Buoy 62092** (M3 Buoy): 53.48°N, 5.42°W
+- **Buoy 62093** (M4 Buoy): 51.22°N, 6.70°W
+- **Buoy 62094** (M5 Buoy): 51.69°N, 6.70°W
+- **Buoy 62095** (M6 Buoy): 53.06°N, 7.90°W
 
 ### Peak Conditions Observed
 
-- **Maximum Wind Speed:** 48.7 knots (90.3 km/h) at Buoy 62095
-- **Maximum Significant Wave Height (Hm0):** 11.5 m at Buoy 62093
-- **Maximum Wave Height (Hmax):** 18.8 m at Buoy 62092
-- **Minimum Pressure:** 952.0 hPa at Buoy 62095
-- **Temperature Range:** 3.6°C (Buoy 62095) to 13.2°C (Buoy 62092)
-- **Total Observations:** 550 records from 4 stations (QC good data only)
+| Buoy (Location) | Sustained Wind Speeds | Gust Wind Speeds | Significant Wave Height | Individual Wave | MSLP (hPa) |
+|---|---|---|---|---|---|
+| M2 Buoy | **80 km/h**<br>(43 knots or 22 mph)<br>Fri 24 Jan 2025 09 UTC | **106 km/h**<br>(57 knots or 29 mph)<br>Fri 24 Jan 2025 09 UTC | **5.5 m**<br>Fri 24 Jan 2025 09 UTC | **9.5 m**<br>Fri 24 Jan 2025 09 UTC | **968.3**<br>Fri 24 Jan 2025 04 UTC |
+| M3 Buoy | **90 km/h**<br>(49 knots or 25 mph)<br>Fri 24 Jan 2025 01 UTC | **98 km/h**<br>(53 knots or 27 mph)<br>Thu 23 Jan 2025 21 UTC | **11.2 m**<br>Sun 26 Jan 2025 23 UTC | **18.8 m**<br>Sun 26 Jan 2025 22 UTC | **962.5**<br>Mon 27 Jan 2025 00 UTC |
+| M4 Buoy | **76 km/h**<br>(41 knots or 21 mph)<br>Fri 24 Jan 2025 13 UTC | **103 km/h**<br>(56 knots or 29 mph)<br>Fri 24 Jan 2025 13 UTC | **11.5 m**<br>Fri 24 Jan 2025 12 UTC | **16.9 m**<br>Fri 24 Jan 2025 12 UTC | **952.7**<br>Fri 24 Jan 2025 02 UTC |
+| M5 Buoy | **56 km/h**<br>(30 knots or 16 mph)<br>Fri 24 Jan 2025 08 UTC | **98 km/h**<br>(53 knots or 27 mph)<br>Fri 24 Jan 2025 07 UTC | **9.5 m**<br>Fri 24 Jan 2025 10 UTC | **14.2 m**<br>Fri 24 Jan 2025 09 UTC | **970.8**<br>Sun 26 Jan 2025 21 UTC |
+| M6 Buoy | **90 km/h**<br>(49 knots or 25 mph)<br>Fri 24 Jan 2025 02 UTC | **109 km/h**<br>(59 knots or 30 mph)<br>Fri 24 Jan 2025 03 UTC | **9.6 m**<br>Fri 24 Jan 2025 02 UTC | **15.8 m**<br>Fri 24 Jan 2025 05 UTC | **952.0**<br>Thu 23 Jan 2025 21 UTC |
 
 
 ### Station-by-Station Analysis
 
-### Buoy 62092 - M2 Buoy
-- **Location:** 53.48°N, 5.42°W
-- **Peak Wind Speed:** 48.6 knots (90.1 km/h)
-- **Peak Significant Wave Height (Hm0):** 11.2 m  
-- **Peak Maximum Wave Height (Hmax):** 18.8 m
-- **Minimum Pressure:** 962.5 hPa
+### Buoy 62091 - M2 Buoy
+- **Location:** 53.47°N, 5.42°W
+- **Peak Wind Speed:** 42.9 knots (79.5 km/h) on Fri 24 Jan 2025 09:00 UTC
+- **Peak Significant Wave Height (Hm0):** 5.5 m on Fri 24 Jan 2025 09:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 9.5 m on Fri 24 Jan 2025 09:00 UTC
+- **Minimum Pressure:** 968.3 hPa on Fri 24 Jan 2025 04:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 92 records (QC good data only)
 
 
-### Buoy 62093 - M3 Buoy
+### Buoy 62092 - M3 Buoy
+- **Location:** 53.48°N, 5.42°W
+- **Peak Wind Speed:** 48.6 knots (90.1 km/h) on Fri 24 Jan 2025 01:00 UTC
+- **Peak Significant Wave Height (Hm0):** 11.2 m on Sun 26 Jan 2025 23:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 18.8 m on Sun 26 Jan 2025 22:00 UTC
+- **Minimum Pressure:** 962.5 hPa on Mon 27 Jan 2025 00:00 UTC
+- **Data Quality:** Excellent (100.0% good data)
+- **Observations:** 92 records (QC good data only)
+
+
+### Buoy 62093 - M4 Buoy
 - **Location:** 51.22°N, 6.70°W
-- **Peak Wind Speed:** 41.1 knots (76.1 km/h)
-- **Peak Significant Wave Height (Hm0):** 11.5 m  
-- **Peak Maximum Wave Height (Hmax):** 16.9 m
-- **Minimum Pressure:** 952.7 hPa
+- **Peak Wind Speed:** 41.1 knots (76.1 km/h) on Fri 24 Jan 2025 13:00 UTC
+- **Peak Significant Wave Height (Hm0):** 11.5 m on Fri 24 Jan 2025 12:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 16.9 m on Fri 24 Jan 2025 12:00 UTC
+- **Minimum Pressure:** 952.7 hPa on Fri 24 Jan 2025 02:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
 - **Observations:** 89 records (QC good data only)
 
 
-### Buoy 62094 - M4 Buoy
+### Buoy 62094 - M5 Buoy
 - **Location:** 51.69°N, 6.70°W
-- **Peak Wind Speed:** 30.2 knots (55.9 km/h)
-- **Peak Significant Wave Height (Hm0):** 9.5 m  
-- **Peak Maximum Wave Height (Hmax):** 17.7 m
-- **Minimum Pressure:** 970.8 hPa
+- **Peak Wind Speed:** 30.2 knots (55.9 km/h) on Fri 24 Jan 2025 08:00 UTC
+- **Peak Significant Wave Height (Hm0):** 9.5 m on Fri 24 Jan 2025 10:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 14.2 m on Fri 24 Jan 2025 09:00 UTC
+- **Minimum Pressure:** 970.8 hPa on Sun 26 Jan 2025 21:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 189 records (QC good data only)
+- **Observations:** 97 records (QC good data only)
 
 
-### Buoy 62095 - M5 Buoy
+### Buoy 62095 - M6 Buoy
 - **Location:** 53.06°N, 7.90°W
-- **Peak Wind Speed:** 48.7 knots (90.3 km/h)
-- **Peak Significant Wave Height (Hm0):** 9.6 m  
-- **Peak Maximum Wave Height (Hmax):** 15.8 m
-- **Minimum Pressure:** 952.0 hPa
+- **Peak Wind Speed:** 48.7 knots (90.3 km/h) on Fri 24 Jan 2025 02:00 UTC
+- **Peak Significant Wave Height (Hm0):** 9.6 m on Fri 24 Jan 2025 02:00 UTC
+- **Peak Maximum Wave Height (Hmax):** 15.8 m on Fri 24 Jan 2025 05:00 UTC
+- **Minimum Pressure:** 952.0 hPa on Thu 23 Jan 2025 21:00 UTC
 - **Data Quality:** Excellent (100.0% good data)
-- **Observations:** 180 records (QC good data only)
+- **Observations:** 93 records (QC good data only)
 
 
 ## Meteorological Analysis
@@ -104,10 +116,10 @@ Atmospheric pressure dropped to a minimum of **952.0 hPa**.
 
 ## Quality Control Summary
 
-**Total Records:** 550
+**Total Records:** 463
 
 **QC Status Distribution:**
-- Good Data (QC=1): 550 records (100.0%)
+- Good Data (QC=1): 463 records (100.0%)
 - Adjusted Data (QC=5): 0 records (0.0%)
 - Missing Data (QC=9): 0 records (0.0%)
 - No QC (QC=0): 0 records (0.0%)
@@ -118,16 +130,19 @@ Atmospheric pressure dropped to a minimum of **952.0 hPa**.
 
 ### Active Logger Information During Storm Period
 
-**Buoy 62092 (M2 Buoy):**
+**Buoy 62091 (M2 Buoy):**
+- Logger(s) used: 12105_CR6      , 7577_CR6       
+
+**Buoy 62092 (M3 Buoy):**
 - Logger(s) used: 12147_CR6      , 427_Wavesense  
 
-**Buoy 62093 (M3 Buoy):**
+**Buoy 62093 (M4 Buoy):**
 - Logger(s) used: 189_Wavesense  , 12144_CR6      
 
-**Buoy 62094 (M4 Buoy):**
+**Buoy 62094 (M5 Buoy):**
 - Logger(s) used: 8704_CR6       , 347_Wavesense  
 
-**Buoy 62095 (M5 Buoy):**
+**Buoy 62095 (M6 Buoy):**
 - Logger(s) used: 12146_CR6      , 13443_CR6      
 
 **Note:** This report uses only quality-controlled data (QC indicators 1 and 5) for meteorological analysis. Logger information shows which data acquisition systems were active during the storm period.
